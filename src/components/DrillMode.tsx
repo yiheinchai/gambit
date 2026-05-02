@@ -167,31 +167,31 @@ export default function DrillMode({ cluster, onClose }: Props) {
 
   if (drillState === "complete") {
     return (
-      <div className="fixed inset-0 bg-black/90 flex items-center justify-center z-50 p-4">
-        <div className="bg-zinc-800 rounded-xl border border-zinc-700 max-w-md w-full p-8 text-center">
-          <h2 className="text-2xl font-bold text-white mb-2">Drill Complete</h2>
-          <p className="text-zinc-400 mb-6">{cluster.label}</p>
+      <div style={{ position: "fixed", inset: 0, background: "rgba(27,39,48,0.85)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 50, padding: 16 }}>
+        <div style={{ background: "white", border: "3px solid var(--ink)", borderRadius: 24, boxShadow: "0 8px 0 var(--ink)", maxWidth: 440, width: "100%", padding: 32, textAlign: "center" }}>
+          <div style={{ width: 64, height: 64, borderRadius: 16, background: "var(--green)", color: "white", display: "grid", placeItems: "center", fontSize: 28, fontWeight: 900, boxShadow: "0 4px 0 var(--green-dark)", margin: "0 auto 16px" }}>✓</div>
+          <h2 style={{ fontSize: 28, fontWeight: 900, letterSpacing: -0.5, color: "var(--ink)" }}>Drill Complete</h2>
+          <p style={{ color: "var(--ink-3)", fontSize: 14, fontWeight: 600, marginTop: 4 }}>{cluster.label}</p>
 
-          <div className="grid grid-cols-3 gap-4 mb-6">
-            <div>
-              <p className="text-3xl font-bold text-white">{stats.total}</p>
-              <p className="text-zinc-500 text-sm">Positions</p>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 12, margin: "24px 0" }}>
+            <div style={{ background: "var(--bg-2)", borderRadius: 14, padding: 14 }}>
+              <p style={{ fontSize: 32, fontWeight: 900, letterSpacing: -1, color: "var(--ink)" }}>{stats.total}</p>
+              <p style={{ fontSize: 11, fontWeight: 700, color: "var(--ink-3)", textTransform: "uppercase", letterSpacing: 0.4 }}>Positions</p>
             </div>
-            <div>
-              <p className="text-3xl font-bold text-green-400">{stats.correct}</p>
-              <p className="text-zinc-500 text-sm">Correct</p>
+            <div style={{ background: "var(--bg-2)", borderRadius: 14, padding: 14 }}>
+              <p style={{ fontSize: 32, fontWeight: 900, letterSpacing: -1, color: "var(--green)" }}>{stats.correct}</p>
+              <p style={{ fontSize: 11, fontWeight: 700, color: "var(--ink-3)", textTransform: "uppercase", letterSpacing: 0.4 }}>Correct</p>
             </div>
-            <div>
-              <p className="text-3xl font-bold text-amber-400">
-                {Math.round(stats.accuracy * 100)}%
-              </p>
-              <p className="text-zinc-500 text-sm">Accuracy</p>
+            <div style={{ background: "var(--bg-2)", borderRadius: 14, padding: 14 }}>
+              <p style={{ fontSize: 32, fontWeight: 900, letterSpacing: -1, color: "var(--orange)" }}>{Math.round(stats.accuracy * 100)}%</p>
+              <p style={{ fontSize: 11, fontWeight: 700, color: "var(--ink-3)", textTransform: "uppercase", letterSpacing: 0.4 }}>Accuracy</p>
             </div>
           </div>
 
           <button
             onClick={onClose}
-            className="px-6 py-3 bg-amber-600 hover:bg-amber-500 text-white font-medium rounded-lg transition-colors"
+            className="btn-duo"
+            style={{ background: "var(--green)", color: "white", padding: "16px 28px", borderRadius: 14, fontSize: 14, boxShadow: "0 4px 0 var(--green-dark)", width: "100%" }}
           >
             Back to Dashboard
           </button>
