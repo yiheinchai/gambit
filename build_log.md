@@ -53,7 +53,7 @@
 - [x] Landing page: feature highlights, privacy note, autofocus
 - [x] .env.example for ANTHROPIC_API_KEY
 
-## Remaining (Deploy / Research)
+## Completed (Testing / Deploy Prep)
 - [x] git init + initial commit (04eea46)
 - [x] Smoke tests: 26/26 passing (API, Stockfish logic, clustering, progress)
 - [x] End-to-end test: Chess.com API → PGN parsing → field mapping verified
@@ -62,8 +62,14 @@
 - [x] ONNX WASM + models directories ready for concept model
 - [x] Training pipeline E2E: generate → train → export → ONNX validate (ALL PASS)
 - [x] 27 concepts matched between Python and TypeScript
-- [x] Commits: 04eea46 → e4125d6 → b3e7cae → 1f1cc83
-- [ ] Deploy to Vercel
+- [x] Analysis cancellation + partial results viewing
+- [x] ETA display during analysis
+- [x] vercel.json with COOP/COEP headers
+- [x] README with setup, architecture, training docs
+- [x] 6 commits: 04eea46 → e4125d6 → b3e7cae → 1f1cc83 → ee689c5 → 54dde14
+
+## Remaining
+- [ ] Push to GitHub + deploy to Vercel
 - [ ] M2: Train on real Lichess data with full-size model (needs GPU)
 - [ ] Manual browser test via /debug page
 

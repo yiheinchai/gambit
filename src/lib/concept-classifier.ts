@@ -191,6 +191,19 @@ export async function computeConceptDiff(
   return { diff, missed, gained };
 }
 
-export function isModelAvailable(): boolean {
-  return typeof window !== "undefined";
+let modelAvailable: boolean | null = null;
+
+export async function isModelAvailable(): Promise<boolean> {
+  if (modelAvailable !== null) return modelAvailable;
+  if (typeof window === "undefined") {
+    modelAvailable = false;
+    return false;
+  }
+  try {
+    const res = await fetch("/models/concept_classifier.onnx", { method: "HEAD" });
+    modelAvailable = res.ok;
+  } catch {
+    modelAvailable = false;
+  }
+  return modelAvailable;
 }

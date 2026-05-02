@@ -5,6 +5,16 @@ import { Chessboard } from "react-chessboard";
 import { Chess } from "chess.js";
 import type { StoredMistake } from "@/lib/db";
 
+const CONCEPT_DISPLAY = [
+  "Fork", "Pin", "Skewer", "Discovered attack", "Back rank",
+  "Hanging piece", "Overloaded defender", "Trapped piece",
+  "Passed pawn", "Isolated pawn", "Doubled pawn", "Backward pawn",
+  "Open file rook", "Bishop pair", "Bad bishop", "Knight outpost",
+  "Weak squares", "Space", "King safety", "Castling", "Pawn shield",
+  "Material up", "Material down", "Imbalance",
+  "Opening", "Middlegame", "Endgame",
+];
+
 interface Props {
   mistake: StoredMistake;
   onClose: () => void;
@@ -128,6 +138,30 @@ export default function GameReview({ mistake, onClose }: Props) {
                   <span>After: {(mistake.evalAfter / 100).toFixed(1)}</span>
                 </div>
               </div>
+
+              {/* Concept tags */}
+              {mistake.conceptDiff && mistake.conceptDiff.length > 0 && (
+                <div>
+                  <p className="text-zinc-500 text-xs uppercase tracking-wider mb-1.5">
+                    What you missed
+                  </p>
+                  <div className="flex flex-wrap gap-1.5">
+                    {mistake.conceptDiff
+                      .map((val, idx) => ({ idx, val }))
+                      .filter((c) => c.val > 0.2)
+                      .sort((a, b) => b.val - a.val)
+                      .slice(0, 4)
+                      .map((c) => (
+                        <span
+                          key={c.idx}
+                          className="px-2 py-1 bg-amber-900/30 border border-amber-700/30 text-amber-400 text-xs rounded"
+                        >
+                          {CONCEPT_DISPLAY[c.idx] || `concept_${c.idx}`}
+                        </span>
+                      ))}
+                  </div>
+                </div>
+              )}
 
               <div className="flex gap-2 pt-2">
                 <button

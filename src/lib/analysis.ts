@@ -1,5 +1,4 @@
 import type { ParsedGame } from "./chesscom-api";
-import type { MistakeInfo } from "./stockfish";
 import { getEngine } from "./stockfish";
 import {
   saveGame,
@@ -8,6 +7,7 @@ import {
   type StoredGame,
   type StoredMistake,
 } from "./db";
+import { isModelAvailable, computeConceptDiff } from "./concept-classifier";
 
 export interface AnalysisProgress {
   phase: "fetching" | "analyzing" | "clustering" | "done";
@@ -32,7 +32,7 @@ export async function analyzeAndStoreGame(
     game.fens,
     game.moves,
     game.playerColor,
-    18,
+    16,
     onProgress
   );
 
@@ -53,9 +53,26 @@ export async function analyzeAndStoreGame(
 
   await saveGame(storedGame);
 
+  const hasModel = await isModelAvailable();
   const storedMistakes: StoredMistake[] = [];
 
   for (const mistake of mistakes) {
+    let conceptVector: number[] | null = null;
+    let conceptDiff: number[] | null = null;
+
+    if (hasModel) {
+      try {
+        const diff = await computeConceptDiff(
+          mistake.fen,
+          mistake.movePlayed,
+          mistake.bestMove
+        );
+        conceptDiff = Array.from(diff.diff);
+      } catch {
+        // model inference failed — continue without concepts
+      }
+    }
+
     const stored: StoredMistake = {
       gameId: game.id,
       username: username.toLowerCase(),
@@ -68,8 +85,8 @@ export async function analyzeAndStoreGame(
       centipawnLoss: mistake.centipawnLoss,
       severity: mistake.severity,
       gamePhase: mistake.gamePhase,
-      conceptVector: null,
-      conceptDiff: null,
+      conceptVector,
+      conceptDiff,
     };
 
     const id = await saveMistake(stored);
