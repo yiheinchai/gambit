@@ -60,8 +60,14 @@ export default function ConceptRadar({ mistakes }: Props) {
   const rings = [0.25, 0.5, 0.75, 1.0];
 
   return (
-    <div className="bg-zinc-800 border border-zinc-700 rounded-lg p-4">
-      <p className="text-zinc-400 text-sm mb-3">Weakness Profile</p>
+    <div style={{ background: "white", border: "3px solid var(--ink)", borderRadius: 20, padding: 20, boxShadow: "0 5px 0 var(--ink)" }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
+        <div>
+          <div style={{ fontSize: 11, fontWeight: 800, color: "var(--ink-3)", textTransform: "uppercase", letterSpacing: 0.5 }}>Concept fingerprint</div>
+          <div style={{ fontSize: 18, fontWeight: 900, marginTop: 2, color: "var(--ink)" }}>Weakness Profile</div>
+        </div>
+        <div style={{ fontSize: 11, fontFamily: "var(--mono)", color: "var(--ink-3)" }}>{topConcepts.length} dims</div>
+      </div>
       <svg viewBox="0 0 300 300" className="w-full max-w-xs mx-auto">
         {rings.map((scale) => (
           <polygon
@@ -74,14 +80,14 @@ export default function ConceptRadar({ mistakes }: Props) {
               })
               .join(" ")}
             fill="none"
-            stroke="#3f3f46"
+            stroke="var(--line)"
             strokeWidth={0.5}
           />
         ))}
         {topConcepts.map((_, i) => {
           const angle = (Math.PI * 2 * i) / n - Math.PI / 2;
           return (
-            <line key={i} x1={cx} y1={cy} x2={cx + maxR * Math.cos(angle)} y2={cy + maxR * Math.sin(angle)} stroke="#3f3f46" strokeWidth={0.5} />
+            <line key={i} x1={cx} y1={cy} x2={cx + maxR * Math.cos(angle)} y2={cy + maxR * Math.sin(angle)} stroke="var(--line)" strokeWidth={0.5} />
           );
         })}
         <polygon points={polygonPoints} fill="#f59e0b" fillOpacity={0.15} stroke="#f59e0b" strokeWidth={2} />
@@ -89,7 +95,7 @@ export default function ConceptRadar({ mistakes }: Props) {
           <circle key={i} cx={p.x} cy={p.y} r={3} fill="#f59e0b" />
         ))}
         {points.map((p, i) => (
-          <text key={i} x={p.labelX} y={p.labelY} textAnchor="middle" dominantBaseline="central" fill="#a1a1aa" fontSize={9}>
+          <text key={i} x={p.labelX} y={p.labelY} textAnchor="middle" dominantBaseline="central" fill="var(--ink-2)" fontSize={9}>
             {p.label}
           </text>
         ))}
