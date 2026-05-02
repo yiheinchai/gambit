@@ -79,74 +79,80 @@ export default function DrillSchedule({ clusters, username, onDrill }: Props) {
         </div>
       </div>
 
-      <div className="space-y-2">
-        {items.map((item) => (
-          <div
-            key={item.cluster.id}
-            className={`flex items-center justify-between p-3 rounded-lg border ${
-              item.status === "due"
-                ? "border-amber-600/40 bg-amber-600/5"
-                : item.status === "new"
-                  ? "border-blue-600/40 bg-blue-600/5"
-                  : item.status === "mastered"
-                    ? "border-green-600/30 bg-green-600/5"
-                    : "border-zinc-700 bg-zinc-800/50"
-            }`}
-          >
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-2">
-                <StatusBadge status={item.status} />
-                <span className="text-white text-sm font-medium truncate">
-                  {item.cluster.label}
-                </span>
-              </div>
-              {item.progress && (
-                <div className="flex items-center gap-3 mt-1 text-xs text-zinc-500 flex-wrap">
-                  <span>{item.progress.totalAttempts} attempts</span>
-                  <span>{Math.round(item.progress.successRate * 100)}% accuracy</span>
-                  {item.progress.novelAttempts != null && item.progress.novelAttempts > 0 && (
-                    <span className={
-                      (item.progress.novelCorrect || 0) / item.progress.novelAttempts >= 0.7
-                        ? "text-green-500"
-                        : "text-amber-500"
-                    }>
-                      {Math.round(((item.progress.novelCorrect || 0) / item.progress.novelAttempts) * 100)}% on new positions
-                    </span>
-                  )}
-                  {item.status === "upcoming" && (
-                    <span>Due {formatRelativeDate(new Date(item.progress.nextDue))}</span>
-                  )}
+      <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+        {items.map((item) => {
+          const statusColors = {
+            due: { border: "var(--orange)", bg: "#FFF4E5" },
+            new: { border: "var(--blue)", bg: "#EBF5FF" },
+            mastered: { border: "var(--green)", bg: "#E8F8E5" },
+            upcoming: { border: "var(--line)", bg: "white" },
+          };
+          const sc = statusColors[item.status];
+
+          return (
+            <div key={item.cluster.id} style={{
+              display: "flex", alignItems: "center", justifyContent: "space-between",
+              padding: 14, borderRadius: 14, border: `2px solid ${sc.border}`, background: sc.bg,
+            }}>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                  <StatusBadge status={item.status} />
+                  <span style={{ fontSize: 14, fontWeight: 800, color: "var(--ink)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                    {item.cluster.label}
+                  </span>
                 </div>
-              )}
+                {item.progress && (
+                  <div style={{ display: "flex", alignItems: "center", gap: 12, marginTop: 4, fontSize: 11, fontFamily: "var(--mono)", color: "var(--ink-3)", flexWrap: "wrap" }}>
+                    <span>{item.progress.totalAttempts} attempts</span>
+                    <span>{Math.round(item.progress.successRate * 100)}% accuracy</span>
+                    {item.progress.novelAttempts != null && item.progress.novelAttempts > 0 && (
+                      <span style={{ color: (item.progress.novelCorrect || 0) / item.progress.novelAttempts >= 0.7 ? "var(--green-dark)" : "var(--orange-dark)" }}>
+                        {Math.round(((item.progress.novelCorrect || 0) / item.progress.novelAttempts) * 100)}% on new
+                      </span>
+                    )}
+                    {item.status === "upcoming" && (
+                      <span>Due {formatRelativeDate(new Date(item.progress.nextDue))}</span>
+                    )}
+                  </div>
+                )}
+              </div>
+              <button
+                onClick={() => onDrill(item.cluster)}
+                className="btn-duo"
+                style={{
+                  background: item.status === "due" || item.status === "new" ? "var(--orange)" : "white",
+                  color: item.status === "due" || item.status === "new" ? "white" : "var(--ink-2)",
+                  border: item.status === "due" || item.status === "new" ? "none" : "2px solid var(--line)",
+                  padding: "10px 16px", borderRadius: 12, fontSize: 12, letterSpacing: 0.4, flexShrink: 0, marginLeft: 12,
+                  boxShadow: item.status === "due" || item.status === "new" ? "0 3px 0 var(--orange-dark)" : "none",
+                }}
+              >
+                {item.status === "new" ? "Start" : "Drill"}
+              </button>
             </div>
-            <button
-              onClick={() => onDrill(item.cluster)}
-              className={`px-3 py-1.5 text-sm rounded-lg transition-colors flex-shrink-0 ml-3 ${
-                item.status === "due" || item.status === "new"
-                  ? "bg-amber-600 hover:bg-amber-500 text-white font-medium"
-                  : "bg-zinc-700 hover:bg-zinc-600 text-zinc-300"
-              }`}
-            >
-              {item.status === "new" ? "Start" : "Drill"}
-            </button>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </section>
   );
 }
 
 function StatusBadge({ status }: { status: ScheduleItem["status"] }) {
-  const styles = {
-    due: "bg-amber-500/20 text-amber-400 border-amber-500/30",
-    new: "bg-blue-500/20 text-blue-400 border-blue-500/30",
-    upcoming: "bg-zinc-700 text-zinc-400 border-zinc-600",
-    mastered: "bg-green-500/20 text-green-400 border-green-500/30",
+  const colors: Record<string, { bg: string; color: string; shadow: string }> = {
+    due: { bg: "var(--orange)", color: "white", shadow: "var(--orange-dark)" },
+    new: { bg: "var(--blue)", color: "white", shadow: "#1E3A8A" },
+    upcoming: { bg: "var(--bg-2)", color: "var(--ink-3)", shadow: "none" },
+    mastered: { bg: "var(--green)", color: "white", shadow: "var(--green-dark)" },
   };
   const labels = { due: "Due", new: "New", upcoming: "Scheduled", mastered: "Mastered" };
+  const c = colors[status];
 
   return (
-    <span className={`text-xs px-1.5 py-0.5 rounded border ${styles[status]}`}>
+    <span style={{
+      fontSize: 10, fontWeight: 900, textTransform: "uppercase", letterSpacing: 0.6,
+      padding: "3px 8px", borderRadius: 6, background: c.bg, color: c.color,
+      boxShadow: c.shadow !== "none" ? `0 2px 0 ${c.shadow}` : "none",
+    }}>
       {labels[status]}
     </span>
   );
