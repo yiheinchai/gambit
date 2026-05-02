@@ -10,7 +10,7 @@ import {
   parseGame,
   type ParsedGame,
 } from "@/lib/chesscom-api";
-import { analyzeAndStoreGame, type AnalysisProgress } from "@/lib/analysis";
+import { analyzeBatch, type AnalysisProgress } from "@/lib/analysis";
 import { computeProgress, type ProgressData } from "@/lib/progress";
 import { computeOpeningStats, type OpeningStats } from "@/lib/openings";
 import { predictEloGain, type EloPrediction } from "@/lib/elo-prediction";
@@ -133,51 +133,43 @@ export default function Home() {
         mistakesFound: cachedMistakes.length,
       }));
 
-      for (let i = 0; i < newGames.length; i++) {
-        if (cancelledRef.current) break;
+      let gamesCompleted = 0;
 
-        setProgress((p) => ({
-          ...p,
-          currentGame: i + 1,
-          totalMoves: newGames[i].moves.length,
-          currentMove: 0,
-        }));
+      await analyzeBatch(
+        newGames,
+        name,
+        depth,
+        2, // concurrency: 2 parallel Stockfish workers
+        (gameIndex, gameMistakes) => {
+          gamesCompleted++;
+          allMistakes.push(...gameMistakes);
 
-        const gameMistakes = await analyzeAndStoreGame(
-          newGames[i],
-          name,
-          (current, total) => {
-            setProgress((p) => ({
-              ...p,
-              currentMove: current,
-              totalMoves: total,
-            }));
-          },
-          depth
-        );
+          const g = newGames[gameIndex];
+          allGames.push({
+            id: g.id,
+            username: name.toLowerCase(),
+            pgn: g.pgn,
+            date: g.date,
+            timeControl: g.timeControl,
+            playerColor: g.playerColor,
+            result: g.result,
+            playerElo: g.playerElo,
+            opponentElo: g.opponentElo,
+            moves: g.moves,
+            fens: g.fens,
+            analyzedAt: new Date(),
+          });
 
-        allMistakes.push(...gameMistakes);
-
-        const g = newGames[i];
-        allGames.push({
-          id: g.id,
-          username: name.toLowerCase(),
-          pgn: g.pgn,
-          date: g.date,
-          timeControl: g.timeControl,
-          playerColor: g.playerColor,
-          result: g.result,
-          playerElo: g.playerElo,
-          opponentElo: g.opponentElo,
-          moves: g.moves,
-          fens: g.fens,
-          analyzedAt: new Date(),
-        });
-
-        setMistakes([...allMistakes]);
-        setGames([...allGames]);
-        setProgress((p) => ({ ...p, mistakesFound: allMistakes.length }));
-      }
+          setMistakes([...allMistakes]);
+          setGames([...allGames]);
+          setProgress((p) => ({
+            ...p,
+            currentGame: gamesCompleted,
+            mistakesFound: allMistakes.length,
+          }));
+        },
+        cancelledRef
+      );
 
       if (!cancelledRef.current) {
         computeDerivedData(allGames, allMistakes);

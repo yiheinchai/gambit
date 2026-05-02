@@ -1,5 +1,5 @@
 import type { ParsedGame } from "./chesscom-api";
-import { getEngine } from "./stockfish";
+import { getEngine, getPool } from "./stockfish";
 import {
   saveGame,
   saveMistake,
@@ -97,6 +97,103 @@ export async function analyzeAndStoreGame(
 
   await markGameAnalyzed(game.id);
   return storedMistakes;
+}
+
+export async function analyzeBatch(
+  games: ParsedGame[],
+  username: string,
+  depth: number = 14,
+  concurrency: number = 2,
+  onGameComplete?: (gameIndex: number, mistakes: StoredMistake[]) => void,
+  cancelled?: { current: boolean }
+): Promise<StoredMistake[]> {
+  const pool = getPool(concurrency);
+  await pool.init();
+
+  const hasModel = await isModelAvailable();
+  const allMistakes: StoredMistake[] = [];
+  let nextIndex = 0;
+  const inFlight = new Set<Promise<void>>();
+
+  async function processGame(game: ParsedGame, index: number) {
+    const mistakes = await pool.analyzeGame(
+      game.fens,
+      game.moves,
+      game.playerColor,
+      depth
+    );
+
+    const storedGame: StoredGame = {
+      id: game.id,
+      username: username.toLowerCase(),
+      pgn: game.pgn,
+      date: game.date,
+      timeControl: game.timeControl,
+      playerColor: game.playerColor,
+      result: game.result,
+      playerElo: game.playerElo,
+      opponentElo: game.opponentElo,
+      moves: game.moves,
+      fens: game.fens,
+      analyzedAt: null,
+    };
+    await saveGame(storedGame);
+
+    const storedMistakes: StoredMistake[] = [];
+    for (const mistake of mistakes) {
+      let conceptDiff: number[] | null = null;
+      if (hasModel) {
+        try {
+          const diff = await computeConceptDiff(mistake.fen, mistake.movePlayed, mistake.bestMove);
+          conceptDiff = Array.from(diff.diff);
+        } catch { /* continue without concepts */ }
+      }
+
+      const stored: StoredMistake = {
+        gameId: game.id,
+        username: username.toLowerCase(),
+        moveNumber: mistake.moveNumber,
+        fen: mistake.fen,
+        movePlayed: mistake.movePlayed,
+        bestMove: mistake.bestMove,
+        evalBefore: mistake.evalBefore,
+        evalAfter: mistake.evalAfter,
+        centipawnLoss: mistake.centipawnLoss,
+        severity: mistake.severity,
+        gamePhase: mistake.gamePhase,
+        conceptVector: null,
+        conceptDiff,
+      };
+      const id = await saveMistake(stored);
+      stored.id = id;
+      storedMistakes.push(stored);
+    }
+
+    await markGameAnalyzed(game.id);
+    allMistakes.push(...storedMistakes);
+    onGameComplete?.(index, storedMistakes);
+  }
+
+  while (nextIndex < games.length) {
+    if (cancelled?.current) break;
+
+    while (inFlight.size < concurrency && nextIndex < games.length) {
+      if (cancelled?.current) break;
+      const idx = nextIndex++;
+      const promise = processGame(games[idx], idx).then(() => {
+        inFlight.delete(promise);
+      });
+      inFlight.add(promise);
+    }
+
+    if (inFlight.size > 0) {
+      await Promise.race(inFlight);
+    }
+  }
+
+  // Wait for remaining
+  await Promise.all(inFlight);
+  return allMistakes;
 }
 
 export function aggregateMistakeStats(mistakes: StoredMistake[]) {

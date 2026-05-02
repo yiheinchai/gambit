@@ -171,3 +171,72 @@ export function getEngine(): StockfishEngine {
   }
   return engineInstance;
 }
+
+export class StockfishPool {
+  private engines: StockfishEngine[] = [];
+  private busy: Set<number> = new Set();
+  private readonly size: number;
+
+  constructor(size: number = 2) {
+    // Cap at navigator.hardwareConcurrency or 4
+    const maxWorkers = typeof navigator !== "undefined"
+      ? Math.min(navigator.hardwareConcurrency || 2, 4)
+      : 2;
+    this.size = Math.min(size, maxWorkers);
+  }
+
+  async init(): Promise<void> {
+    while (this.engines.length < this.size) {
+      const engine = new StockfishEngine();
+      await engine.init();
+      this.engines.push(engine);
+    }
+  }
+
+  private async acquire(): Promise<{ engine: StockfishEngine; idx: number }> {
+    // Wait for a free engine
+    while (true) {
+      for (let i = 0; i < this.engines.length; i++) {
+        if (!this.busy.has(i)) {
+          this.busy.add(i);
+          return { engine: this.engines[i], idx: i };
+        }
+      }
+      await new Promise((r) => setTimeout(r, 50));
+    }
+  }
+
+  private release(idx: number) {
+    this.busy.delete(idx);
+  }
+
+  async analyzeGame(
+    fens: string[],
+    moves: string[],
+    playerColor: "white" | "black",
+    depth: number = 16,
+    onProgress?: (current: number, total: number) => void
+  ): Promise<MistakeInfo[]> {
+    const { engine, idx } = await this.acquire();
+    try {
+      return await engine.analyzeGame(fens, moves, playerColor, depth, onProgress);
+    } finally {
+      this.release(idx);
+    }
+  }
+
+  destroy() {
+    for (const engine of this.engines) engine.destroy();
+    this.engines = [];
+    this.busy.clear();
+  }
+}
+
+let poolInstance: StockfishPool | null = null;
+
+export function getPool(size: number = 2): StockfishPool {
+  if (!poolInstance) {
+    poolInstance = new StockfishPool(size);
+  }
+  return poolInstance;
+}
