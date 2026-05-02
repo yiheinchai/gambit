@@ -1,8 +1,8 @@
 # Gambit Build Log
 
 ## Current State
-**Phase**: Feature-complete. All milestones done. Ready to deploy.
-**Last updated**: 2026-05-02 iteration 13
+**Phase**: Feature-complete. Polished. Retrained on real data.
+**Last updated**: 2026-05-02 iteration 14
 **Build status**: TypeScript clean. 26/26 tests pass. Production build passes.
 **Codebase**: 28 TS files (4114 lines) + 7 Python files (1082 lines) + 11 components + 9 lib modules
 **Repo**: https://github.com/yiheinchai/gambit (12 commits)
@@ -66,6 +66,12 @@
 - [x] ONNX model committed (7MB) for Vercel
 - [x] postinstall copies Stockfish + ONNX WASM from npm
 - [x] .env.example, README with full docs
+
+### Latest (Iteration 14)
+- [x] Analysis depth presets: Quick Scan (d10/20g), Standard (d14/50g), Deep (d18/100g)
+- [x] Drill keyboard shortcuts: Enter/Space (next), R (retry), Esc (exit)
+- [x] Concept model retrained on 50K real Lichess positions (Jan 2013 DB)
+- [x] All endpoints verified via HTTP smoke tests
 
 ## To Deploy
 1. Go to https://vercel.com/new
