@@ -16,6 +16,7 @@ import torch
 
 from board_encoder import encode_board
 from move_predictor import MovePredictor
+from chess_transformer import ChessTransformer
 from sparse_autoencoder import SparseAutoencoder
 
 
@@ -27,6 +28,7 @@ def main():
     parser.add_argument("--concepts", required=True)
     parser.add_argument("--channels", type=int, default=128)
     parser.add_argument("--blocks", type=int, default=6)
+    parser.add_argument("--model-type", default="auto", choices=["auto", "cnn", "transformer"])
     args = parser.parse_args()
 
     # Load models
@@ -37,9 +39,19 @@ def main():
 
     state = torch.load(args.checkpoint, map_location="cpu", weights_only=True)
     vocab_size = state["head.weight"].shape[0]
-    model = MovePredictor(vocab_size, args.channels, args.blocks)
+
+    # Auto-detect model type from checkpoint keys
+    is_transformer = args.model_type == "transformer" or (
+        args.model_type == "auto" and "transformer.layers.0.self_attn.in_proj_weight" in state
+    )
+
+    if is_transformer:
+        model = ChessTransformer(vocab_size, args.channels, 4, 4)
+    else:
+        model = MovePredictor(vocab_size, args.channels, args.blocks)
     model.load_state_dict(state)
     model.eval()
+    print(f"Model type: {'transformer' if is_transformer else 'cnn'}")
 
     with open(args.concepts) as f:
         concepts_data = json.load(f)
