@@ -143,20 +143,19 @@ export default function ProgressView({
       )}
 
       {/* Recent results */}
-      <div className="bg-zinc-800 border border-zinc-700 rounded-lg p-4">
-        <p className="text-zinc-400 text-sm mb-3">Recent Games</p>
-        <div className="flex gap-1 flex-wrap">
+      <div style={{ background: "white", border: "3px solid var(--ink)", borderRadius: 20, padding: 16, boxShadow: "0 5px 0 var(--ink)" }}>
+        <p style={{ fontSize: 11, fontWeight: 800, color: "var(--ink-3)", textTransform: "uppercase", letterSpacing: 0.5, marginBottom: 10 }}>Recent Games</p>
+        <div style={{ display: "flex", gap: 4, flexWrap: "wrap" }}>
           {progress.games.slice(-50).map((g, i) => (
             <div
               key={i}
-              className={`w-6 h-6 rounded text-xs flex items-center justify-center font-medium ${
-                g.result === "win"
-                  ? "bg-green-600/30 text-green-400"
-                  : g.result === "loss"
-                    ? "bg-red-600/30 text-red-400"
-                    : "bg-zinc-700 text-zinc-400"
-              }`}
               title={`${g.result} vs ${g.opponentElo} (${g.mistakeCount} mistakes)`}
+              style={{
+                width: 24, height: 24, borderRadius: 6, fontSize: 10, fontWeight: 900,
+                display: "flex", alignItems: "center", justifyContent: "center",
+                background: g.result === "win" ? "var(--green)" : g.result === "loss" ? "var(--red)" : "var(--bg-2)",
+                color: g.result === "draw" ? "var(--ink-3)" : "white",
+              }}
             >
               {g.result === "win" ? "W" : g.result === "loss" ? "L" : "D"}
             </div>
@@ -179,12 +178,12 @@ function MiniStat({
   color?: string;
 }) {
   return (
-    <div className="bg-zinc-800 border border-zinc-700 rounded-lg p-3 text-center">
-      <p className={`text-xl font-bold ${color}`}>
+    <div style={{ background: "white", border: "2px solid var(--line)", borderRadius: 16, padding: 12, textAlign: "center" }}>
+      <p style={{ fontSize: 24, fontWeight: 900, letterSpacing: -0.5, color: color?.includes("green") ? "var(--green)" : color?.includes("red") ? "var(--red)" : "var(--ink)" }}>
         {value}
-        {suffix && <span className="text-sm text-zinc-500 ml-1">{suffix}</span>}
+        {suffix && <span style={{ fontSize: 12, color: "var(--ink-3)", marginLeft: 4 }}>{suffix}</span>}
       </p>
-      <p className="text-zinc-500 text-xs mt-0.5">{label}</p>
+      <p style={{ fontSize: 10, fontWeight: 700, color: "var(--ink-3)", textTransform: "uppercase", letterSpacing: 0.4, marginTop: 2 }}>{label}</p>
     </div>
   );
 }
