@@ -198,55 +198,61 @@ export default function DebugPage() {
   const failCount = results.filter((r) => r.status === "fail").length;
 
   return (
-    <div className="min-h-screen bg-zinc-900 text-white p-8 max-w-2xl mx-auto">
+    <div style={{ minHeight: "100vh", background: "var(--bg)", padding: 32, maxWidth: 640, margin: "0 auto", fontFamily: "var(--sans)" }}>
       <h1 style={{ fontSize: 24, fontWeight: 900, marginBottom: 8, color: "var(--ink)" }}>missedtake — Diagnostics</h1>
-      <p className="text-zinc-500 text-sm mb-6">
+      <p style={{ fontSize: 13, color: "var(--ink-3)", marginBottom: 24 }}>
         Tests the full stack: Stockfish WASM, Chess.com API, PGN parsing, IndexedDB, ONNX concept model, and concept diff pipeline.
       </p>
 
       <button
         onClick={runTests}
         disabled={running}
-        className="px-5 py-2.5 bg-amber-600 hover:bg-amber-500 disabled:bg-zinc-700 text-white font-medium rounded-lg mb-6"
+        className="btn-duo"
+        style={{
+          background: running ? "var(--bg-2)" : "var(--green)", color: running ? "var(--ink-3)" : "white",
+          padding: "12px 24px", borderRadius: 14, fontSize: 14, marginBottom: 24,
+          boxShadow: running ? "none" : "0 4px 0 var(--green-dark)",
+          cursor: running ? "default" : "pointer",
+        }}
       >
         {running ? "Running..." : "Run All Tests"}
       </button>
 
       {results.length > 0 && (
-        <div className="space-y-3">
-          {results.map((r) => (
+        <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+          {results.map((r) => {
+            const statusColors = {
+              pass: { border: "var(--green)", bg: "#E8F8E5" },
+              fail: { border: "var(--red)", bg: "#FEECEC" },
+              running: { border: "var(--orange)", bg: "#FFF4E5" },
+              pending: { border: "var(--line)", bg: "white" },
+            };
+            const sc = statusColors[r.status];
+            return (
             <div
               key={r.name}
-              className={`p-3 rounded-lg border ${
-                r.status === "pass"
-                  ? "border-green-700 bg-green-900/20"
-                  : r.status === "fail"
-                    ? "border-red-700 bg-red-900/20"
-                    : r.status === "running"
-                      ? "border-amber-700 bg-amber-900/20"
-                      : "border-zinc-700 bg-zinc-800"
-              }`}
+              style={{ padding: 14, borderRadius: 14, border: `2px solid ${sc.border}`, background: sc.bg }}
             >
-              <div className="flex items-center gap-2">
-                <span className="text-sm">
-                  {r.status === "pass" ? "+" : r.status === "fail" ? "x" : r.status === "running" ? "~" : "-"}
+              <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                <span style={{ fontSize: 14, fontWeight: 900, color: r.status === "pass" ? "var(--green-dark)" : r.status === "fail" ? "var(--red)" : "var(--ink-3)" }}>
+                  {r.status === "pass" ? "✓" : r.status === "fail" ? "✗" : r.status === "running" ? "~" : "·"}
                 </span>
-                <span className="font-medium text-sm">{r.name}</span>
+                <span style={{ fontSize: 14, fontWeight: 800, color: "var(--ink)" }}>{r.name}</span>
                 {r.duration !== undefined && (
-                  <span className="text-zinc-500 text-xs ml-auto">{r.duration}ms</span>
+                  <span style={{ fontSize: 11, fontFamily: "var(--mono)", color: "var(--ink-3)", marginLeft: "auto" }}>{r.duration}ms</span>
                 )}
               </div>
               {r.detail && (
-                <p className="text-zinc-400 text-xs mt-1 ml-5">{r.detail}</p>
+                <p style={{ fontSize: 11, fontFamily: "var(--mono)", color: "var(--ink-3)", marginTop: 4, marginLeft: 22 }}>{r.detail}</p>
               )}
             </div>
-          ))}
+          );})}
 
           {!running && results.length > 0 && (
-            <p className="text-sm mt-4">
-              <span className="text-green-400">{passCount} passed</span>
+            <p style={{ fontSize: 14, fontWeight: 800, marginTop: 16 }}>
+              <span style={{ color: "var(--green-dark)" }}>{passCount} passed</span>
               {failCount > 0 && (
-                <span className="text-red-400 ml-2">{failCount} failed</span>
+                <span style={{ color: "var(--red)", marginLeft: 8 }}>{failCount} failed</span>
               )}
             </p>
           )}
