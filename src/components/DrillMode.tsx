@@ -3,6 +3,7 @@ import { useState, useCallback, useEffect } from "react";
 import { Chessboard } from "react-chessboard";
 import { Chess } from "chess.js";
 import type { WeaknessCluster } from "@/lib/clustering";
+import { CONCEPT_NAMES } from "@/lib/concept-classifier";
 import {
   createDrillSession,
   evaluateMove,
@@ -272,6 +273,7 @@ export default function DrillMode({ cluster, onClose }: Props) {
                   type={drillState}
                   movePlayed={lastAttempt?.movePlayed}
                   bestMove={lastAttempt?.bestMove}
+                  conceptDiff={currentPosition ? cluster.mistakes.find(m => m.id === currentPosition.mistakeId)?.conceptDiff : undefined}
                   onNext={handleNext}
                   onRetry={handleRetry}
                 />
@@ -309,16 +311,29 @@ export default function DrillMode({ cluster, onClose }: Props) {
   );
 }
 
-function DrillFeedbackBanner({ type, movePlayed, bestMove, onNext, onRetry }: {
-  type: "correct" | "incorrect"; movePlayed?: string; bestMove?: string; onNext: () => void; onRetry: () => void;
+function DrillFeedbackBanner({ type, movePlayed, bestMove, conceptDiff, onNext, onRetry }: {
+  type: "correct" | "incorrect"; movePlayed?: string; bestMove?: string; conceptDiff?: number[] | null; onNext: () => void; onRetry: () => void;
 }) {
+  // CONCEPT_NAMES imported at top of file
+  const topConcepts = conceptDiff
+    ? Array.from(conceptDiff)
+        .map((val, i) => ({ name: (CONCEPT_NAMES[i] || `feature_${i}`).replace(/_/g, " "), val }))
+        .filter(c => c.val > 0.1 && !c.name.startsWith("feature "))
+        .sort((a, b) => b.val - a.val)
+        .slice(0, 2)
+    : [];
   if (type === "correct") {
     return (
       <div style={{ background: "#E8F8E5", border: "2.5px solid var(--green)", borderRadius: 16, padding: 16, boxShadow: "0 4px 0 var(--green-dark)", display: "flex", gap: 14, alignItems: "center" }}>
         <div style={{ width: 48, height: 48, borderRadius: 12, background: "var(--green)", color: "white", display: "grid", placeItems: "center", fontSize: 22, fontWeight: 900, boxShadow: "0 3px 0 var(--green-dark)", flexShrink: 0 }}>✓</div>
         <div style={{ flex: 1 }}>
           <div style={{ fontSize: 14, fontWeight: 900, color: "var(--green-dark)", letterSpacing: 0.4, textTransform: "uppercase" }}>Correct!</div>
-          <div style={{ fontSize: 13, color: "var(--ink)", marginTop: 2, fontWeight: 500 }}>You found <b>{movePlayed}</b>.</div>
+          <div style={{ fontSize: 13, color: "var(--ink)", marginTop: 2, fontWeight: 500 }}>
+            You found <b>{movePlayed}</b>.
+            {topConcepts.length > 0 && (
+              <span style={{ color: "var(--ink-3)" }}> Key concepts: {topConcepts.map(c => c.name).join(", ")}.</span>
+            )}
+          </div>
         </div>
         <button onClick={onNext} className="btn-duo" style={{ background: "var(--green)", color: "white", padding: "16px 22px", borderRadius: 14, fontSize: 13, letterSpacing: 0.6, boxShadow: "0 4px 0 var(--green-dark)", whiteSpace: "nowrap" }}>Next →</button>
       </div>
@@ -329,7 +344,12 @@ function DrillFeedbackBanner({ type, movePlayed, bestMove, onNext, onRetry }: {
       <div style={{ width: 48, height: 48, borderRadius: 12, background: "var(--red)", color: "white", display: "grid", placeItems: "center", fontSize: 22, fontWeight: 900, boxShadow: "0 3px 0 #A8281C", flexShrink: 0 }}>✗</div>
       <div style={{ flex: 1 }}>
         <div style={{ fontSize: 14, fontWeight: 900, color: "#A8281C", letterSpacing: 0.4, textTransform: "uppercase" }}>Not quite</div>
-        <div style={{ fontSize: 13, color: "var(--ink)", marginTop: 2, fontWeight: 500 }}>You played <b>{movePlayed}</b>. Best: <b style={{ color: "var(--green-dark)" }}>{bestMove}</b></div>
+        <div style={{ fontSize: 13, color: "var(--ink)", marginTop: 2, fontWeight: 500 }}>
+          You played <b>{movePlayed}</b>. Best: <b style={{ color: "var(--green-dark)" }}>{bestMove}</b>
+          {topConcepts.length > 0 && (
+            <span style={{ color: "var(--ink-3)" }}> — the engine's move addresses: {topConcepts.map(c => c.name).join(", ")}.</span>
+          )}
+        </div>
       </div>
       <div style={{ display: "flex", flexDirection: "column", gap: 6, flexShrink: 0 }}>
         <button onClick={onRetry} style={{ background: "white", color: "var(--ink)", border: "2px solid var(--line)", padding: "10px 16px", borderRadius: 12, fontFamily: "var(--sans)", fontWeight: 800, fontSize: 12, cursor: "pointer" }}>Retry</button>
