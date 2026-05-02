@@ -8,6 +8,7 @@ import { fetchExplanation } from "@/lib/explanations";
 interface Props {
   cluster: WeaknessCluster;
   onDrill: (cluster: WeaknessCluster) => void;
+  onPuzzle: (cluster: WeaknessCluster) => void;
   onExpand: (cluster: WeaknessCluster) => void;
 }
 
@@ -23,7 +24,7 @@ const severityBadge = {
   minor: "bg-yellow-500/20 text-yellow-400 border-yellow-500/30",
 };
 
-export default function WeaknessClusterCard({ cluster, onDrill, onExpand }: Props) {
+export default function WeaknessClusterCard({ cluster, onDrill, onPuzzle, onExpand }: Props) {
   const previewMistake = cluster.mistakes[0];
   const [explanation, setExplanation] = useState(cluster.description);
 
@@ -88,7 +89,7 @@ export default function WeaknessClusterCard({ cluster, onDrill, onExpand }: Prop
         </div>
       </div>
 
-      <div className="mt-4 flex gap-2">
+      <div className="mt-4 flex flex-wrap gap-2">
         <button
           onClick={(e) => {
             e.stopPropagation();
@@ -97,6 +98,15 @@ export default function WeaknessClusterCard({ cluster, onDrill, onExpand }: Prop
           className="px-4 py-2 bg-amber-600 hover:bg-amber-500 text-white text-sm font-medium rounded-lg transition-colors"
         >
           Drill This
+        </button>
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            onPuzzle(cluster);
+          }}
+          className="px-4 py-2 bg-blue-700 hover:bg-blue-600 text-white text-sm rounded-lg transition-colors"
+        >
+          Puzzles
         </button>
         <button
           onClick={(e) => {

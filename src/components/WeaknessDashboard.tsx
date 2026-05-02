@@ -10,6 +10,7 @@ import WeaknessClusterCard from "./WeaknessClusterCard";
 import DrillMode from "./DrillMode";
 import ConceptRadar from "./ConceptRadar";
 import DrillSchedule from "./DrillSchedule";
+import PuzzleMode from "./PuzzleMode";
 
 interface Props {
   mistakes: StoredMistake[];
@@ -24,6 +25,7 @@ export default function WeaknessDashboard({
 }: Props) {
   const [selectedMistake, setSelectedMistake] = useState<StoredMistake | null>(null);
   const [drillCluster, setDrillCluster] = useState<WeaknessCluster | null>(null);
+  const [puzzleCluster, setPuzzleCluster] = useState<WeaknessCluster | null>(null);
   const [expandedCluster, setExpandedCluster] = useState<WeaknessCluster | null>(null);
   const [scheduleKey, setScheduleKey] = useState(0);
 
@@ -50,6 +52,13 @@ export default function WeaknessDashboard({
             setDrillCluster(null);
             setScheduleKey((k) => k + 1);
           }}
+        />
+      )}
+
+      {puzzleCluster && (
+        <PuzzleMode
+          cluster={puzzleCluster}
+          onClose={() => setPuzzleCluster(null)}
         />
       )}
 
@@ -104,6 +113,7 @@ export default function WeaknessDashboard({
                 key={cluster.id}
                 cluster={cluster}
                 onDrill={setDrillCluster}
+                onPuzzle={setPuzzleCluster}
                 onExpand={setExpandedCluster}
               />
             ))}
