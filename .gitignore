@@ -44,7 +44,6 @@ next-env.d.ts
 # wasm binaries (large, installed from npm via postinstall)
 /public/stockfish/*.wasm
 /public/onnx/*.wasm
-/public/models/*.onnx
 
 # training data, models, and venv (large)
 /training/data/
