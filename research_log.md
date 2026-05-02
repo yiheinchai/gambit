@@ -178,7 +178,10 @@ Experiment 3 showed that depth doesn't help with limited data. The bottleneck is
 | 8     | 16.4%     | 16.6%   | 32.4%     | 36m |
 | 9     | 17.8%     | 17.3%   | 34.1%     | 34m |
 
-Already surpassing Exp 2 at same epoch count. Trend suggests >20% peak.
+| 11    | 20.1%     | 19.0%   | 36.1%     | 30m |
+| 12    | 20.9%     | 19.6%   | 37.3%     | 28m |
+
+**New record at epoch 12: 19.6% top-1, 37.3% top-3.** Clear improvement from more data. Still climbing.
 
 ### Results
 *(pending)*
