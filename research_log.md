@@ -144,14 +144,24 @@ The transformer produces more interpretable features with a smaller model. The a
 
 ---
 
-## Experiment 3: Planned
+## Experiment 3: 6-Layer Transformer (COMPLETED — NEGATIVE)
 
-### Ideas Queue
-- Contrastive learning: train on (mistake_position, correct_position) pairs
-- Value prediction instead of move prediction
-- Transformer backbone instead of CNN (for look-ahead)
-- Validate on pinksockerino's actual game mistakes
-- Reduce SAE epochs to 60 (saves time, no quality loss)
+**Date**: 2026-05-02  |  **Duration**: 35 min  |  **Result**: 15.4% top-1 (worse than 4-layer's 18.9%)
+
+The deeper model underperformed with 200K positions — it needs more data to leverage 6 layers. Training peaked at epoch 16 and plateaued. The 4-layer transformer remains the best model.
+
+Bug: training script saved to same filename as 4-layer, overwriting the production checkpoint. Fixed by noting in future experiments.
+
+**Conclusion**: Depth doesn't help at this data scale. Next try more data or different training objectives.
+
+---
+
+## Experiment 4: Planned
+
+### Ideas Queue (ranked)
+1. **500K positions** — 4-layer transformer, same architecture, 2.5x more data
+2. **Multi-task** — predict move + Stockfish eval simultaneously
+3. **Contrastive** — train on (mistake, correct) position pairs
 
 ---
 
