@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect, useRef } from "react";
 import type { AnalysisProgress as AnalysisProgressType } from "@/lib/analysis";
 
 interface Props {
@@ -15,16 +16,48 @@ const phaseLabels: Record<AnalysisProgressType["phase"], string> = {
 
 export default function AnalysisProgress({ progress }: Props) {
   const { phase, currentGame, totalGames, currentMove, totalMoves, mistakesFound } = progress;
+  const startTimeRef = useRef<number | null>(null);
+  const [eta, setEta] = useState<string>("");
+
+  useEffect(() => {
+    if (phase === "analyzing" && currentGame === 1 && currentMove === 0) {
+      startTimeRef.current = Date.now();
+    }
+  }, [phase, currentGame, currentMove]);
+
+  useEffect(() => {
+    if (phase !== "analyzing" || !startTimeRef.current || currentGame < 2) {
+      setEta("");
+      return;
+    }
+
+    const elapsed = Date.now() - startTimeRef.current;
+    const gamesCompleted = currentGame - 1;
+    if (gamesCompleted <= 0) return;
+
+    const msPerGame = elapsed / gamesCompleted;
+    const remaining = totalGames - currentGame + 1;
+    const etaMs = remaining * msPerGame;
+
+    if (etaMs < 60000) {
+      setEta(`~${Math.ceil(etaMs / 1000)}s remaining`);
+    } else {
+      setEta(`~${Math.ceil(etaMs / 60000)}min remaining`);
+    }
+  }, [phase, currentGame, totalGames]);
 
   const gamePercent = totalGames > 0 ? (currentGame / totalGames) * 100 : 0;
   const movePercent = totalMoves > 0 ? (currentMove / totalMoves) * 100 : 0;
 
   return (
-    <div className="w-full max-w-lg mx-auto space-y-6">
+    <div className="w-full max-w-lg mx-auto space-y-5">
       <div className="text-center">
         <p className="text-zinc-300 text-lg font-medium">
           {phaseLabels[phase]}
         </p>
+        {eta && (
+          <p className="text-zinc-600 text-sm mt-1">{eta}</p>
+        )}
       </div>
 
       {phase === "analyzing" && (
@@ -36,9 +69,9 @@ export default function AnalysisProgress({ progress }: Props) {
               </span>
               <span>{Math.round(gamePercent)}%</span>
             </div>
-            <div className="w-full bg-zinc-800 rounded-full h-2">
+            <div className="w-full bg-zinc-800 rounded-full h-2.5">
               <div
-                className="bg-amber-500 h-2 rounded-full transition-all duration-300"
+                className="bg-amber-500 h-2.5 rounded-full transition-all duration-300"
                 style={{ width: `${gamePercent}%` }}
               />
             </div>

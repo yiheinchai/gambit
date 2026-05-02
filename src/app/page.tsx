@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useRef } from "react";
 import UsernameForm from "@/components/UsernameForm";
 import AnalysisProgressComponent from "@/components/AnalysisProgress";
 import WeaknessDashboard from "@/components/WeaknessDashboard";
@@ -38,6 +38,19 @@ export default function Home() {
   const [games, setGames] = useState<StoredGame[]>([]);
   const [progressData, setProgressData] = useState<ProgressData | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const cancelledRef = useRef(false);
+
+  const showResults = useCallback(() => {
+    if (mistakes.length > 0 && games.length > 0) {
+      setProgressData(computeProgress(games, mistakes));
+      setState("results");
+    }
+  }, [mistakes, games]);
+
+  const handleCancel = useCallback(() => {
+    cancelledRef.current = true;
+    showResults();
+  }, [showResults]);
 
   const handleAnalyze = useCallback(async (name: string) => {
     setUsername(name);
@@ -46,11 +59,11 @@ export default function Home() {
     setMistakes([]);
     setGames([]);
     setTab("weaknesses");
+    cancelledRef.current = false;
 
     try {
       setProgress((p) => ({ ...p, phase: "fetching" }));
 
-      // Load cached analysis from IndexedDB
       const analyzedIds = await getAnalyzedGameIds(name);
       const cachedGames = await getGamesByUsername(name.toLowerCase());
       const cachedMistakes = await getMistakesByUsername(name.toLowerCase());
@@ -63,18 +76,14 @@ export default function Home() {
       }
       const parsedGames: ParsedGame[] = rawGames
         .map((g) => parseGame(g, name))
-        .filter((g) => g.moves.length > 4); // skip trivially short games
+        .filter((g) => g.moves.length > 4);
 
-      // Split into already-analyzed and new games
       const newGames = parsedGames.filter((g) => !analyzedIds.has(g.id));
-      const skippedCount = parsedGames.length - newGames.length;
 
-      // Start with cached data
       const allMistakes: StoredMistake[] = [...cachedMistakes];
       const allGames: StoredGame[] = [...cachedGames];
 
       if (newGames.length === 0) {
-        // All games already analyzed — jump to results
         setMistakes(allMistakes);
         setGames(allGames);
         setProgressData(computeProgress(allGames, allMistakes));
@@ -91,6 +100,8 @@ export default function Home() {
       }));
 
       for (let i = 0; i < newGames.length; i++) {
+        if (cancelledRef.current) break;
+
         setProgress((p) => ({
           ...p,
           currentGame: i + 1,
@@ -133,10 +144,13 @@ export default function Home() {
         setProgress((p) => ({ ...p, mistakesFound: allMistakes.length }));
       }
 
-      setProgressData(computeProgress(allGames, allMistakes));
-      setProgress((p) => ({ ...p, phase: "done" }));
-      setState("results");
+      if (!cancelledRef.current) {
+        setProgressData(computeProgress(allGames, allMistakes));
+        setProgress((p) => ({ ...p, phase: "done" }));
+        setState("results");
+      }
     } catch (err) {
+      if (cancelledRef.current) return;
       const msg = err instanceof Error ? err.message : "Something went wrong";
       if (msg.includes("not found")) {
         setError(`Player "${name}" not found on Chess.com. Check the username and try again.`);
@@ -167,19 +181,46 @@ export default function Home() {
         <div className="flex-1 flex items-center justify-center w-full">
           <div className="w-full max-w-lg">
             <AnalysisProgressComponent progress={progress} />
+
+            {/* Action buttons during analysis */}
+            <div className="flex justify-center gap-3 mt-6">
+              {mistakes.length >= 3 && (
+                <button
+                  onClick={showResults}
+                  className="px-4 py-2 bg-amber-600 hover:bg-amber-500 text-white text-sm font-medium rounded-lg transition-colors"
+                >
+                  View Results So Far ({mistakes.length} mistakes)
+                </button>
+              )}
+              <button
+                onClick={handleCancel}
+                className="px-4 py-2 bg-zinc-700 hover:bg-zinc-600 text-zinc-300 text-sm rounded-lg transition-colors"
+              >
+                Stop Analysis
+              </button>
+            </div>
+
             {mistakes.length > 0 && (
-              <div className="mt-8">
+              <div className="mt-6">
                 <p className="text-zinc-500 text-sm mb-3">
-                  Mistakes found so far:
+                  Recent finds:
                 </p>
-                <div className="space-y-2 max-h-64 overflow-y-auto">
+                <div className="space-y-2 max-h-48 overflow-y-auto">
                   {mistakes.slice(-5).map((m) => (
                     <div
                       key={m.id}
-                      className="text-xs text-zinc-400 bg-zinc-800 rounded px-3 py-2"
+                      className="text-xs text-zinc-400 bg-zinc-800 rounded px-3 py-2 flex justify-between"
                     >
-                      Move {m.moveNumber}: played {m.movePlayed} instead of{" "}
-                      {m.bestMove} (-{m.centipawnLoss}cp, {m.severity})
+                      <span>
+                        Move {m.moveNumber}: {m.movePlayed} instead of {m.bestMove}
+                      </span>
+                      <span className={
+                        m.severity === "blunder" ? "text-red-400" :
+                        m.severity === "mistake" ? "text-orange-400" :
+                        "text-yellow-400"
+                      }>
+                        -{m.centipawnLoss}cp
+                      </span>
                     </div>
                   ))}
                 </div>
@@ -191,7 +232,6 @@ export default function Home() {
 
       {state === "results" && (
         <div className="w-full max-w-4xl mx-auto">
-          {/* Tab bar */}
           <div className="flex gap-1 mb-6 bg-zinc-800 rounded-lg p-1 max-w-xs mx-auto">
             <TabButton
               label="Weaknesses"

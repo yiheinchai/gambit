@@ -1,36 +1,73 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Gambit
+
+A browser-based chess improvement app that analyzes your Chess.com games, identifies recurring weakness patterns, and provides targeted drills.
+
+## Features
+
+- **Game Analysis**: Fetches your games from Chess.com and analyzes every position with Stockfish WASM (runs entirely in your browser)
+- **Weakness Clustering**: Groups your mistakes by pattern — not just "you blundered" but "you keep missing knight forks in the middlegame"
+- **Interactive Drills**: Practice your actual mistake positions with real-time Stockfish evaluation
+- **Progress Tracking**: Elo trends, mistake rates, phase breakdowns, spaced repetition scheduling
+- **Coaching Explanations**: Optional LLM-powered explanations for each weakness pattern (requires API key)
+
+All analysis runs client-side. No game data leaves your browser.
 
 ## Getting Started
 
-First, run the development server:
-
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000), enter a Chess.com username, and start analyzing.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Optional: LLM Explanations
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Copy `.env.example` to `.env.local` and add your Anthropic API key for coaching-style weakness explanations:
 
-## Learn More
+```bash
+cp .env.example .env.local
+# Edit .env.local and add your ANTHROPIC_API_KEY
+```
 
-To learn more about Next.js, take a look at the following resources:
+## Architecture
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```
+Browser (client-side):
+  Chess.com API → fetch games
+  Stockfish WASM → evaluate positions, find mistakes
+  ONNX model → classify mistake patterns (concept probes)
+  k-means → cluster similar mistakes
+  Drill engine → interactive practice
+  IndexedDB → persist everything locally
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Server (optional):
+  /api/explain → Claude Haiku coaching explanations
+```
 
-## Deploy on Vercel
+## Training the Concept Model
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+The concept classifier is a small CNN (~2.5M params) that maps chess positions to concept activation vectors, distilled from chess transformer representations.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```bash
+cd training
+python -m venv .venv && source .venv/bin/activate
+pip install -r requirements.txt
+
+# Quick test (synthetic data, ~15s)
+cd scripts && python test_pipeline.py
+
+# Full training (needs Lichess PGN)
+python generate_dataset.py --pgn ../data/lichess.pgn --output ../data/concepts.h5
+python train.py --dataset ../data/concepts.h5 --epochs 50
+python export_for_browser.py --checkpoint ../models/concept_classifier_best.pt --output ../../public/models/concept_classifier.onnx
+```
+
+## Tech Stack
+
+- Next.js 16, React 19, TypeScript, Tailwind CSS
+- chess.js, react-chessboard v5
+- Stockfish 18 WASM (lite, 7MB)
+- ONNX Runtime Web
+- IndexedDB via idb
+- PyTorch (training pipeline)
