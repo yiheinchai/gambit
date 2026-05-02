@@ -199,7 +199,7 @@ export default function DebugPage() {
 
   return (
     <div className="min-h-screen bg-zinc-900 text-white p-8 max-w-2xl mx-auto">
-      <h1 className="text-2xl font-bold mb-2">Gambit — Diagnostics</h1>
+      <h1 style={{ fontSize: 24, fontWeight: 900, marginBottom: 8, color: "var(--ink)" }}>missedtake — Diagnostics</h1>
       <p className="text-zinc-500 text-sm mb-6">
         Tests the full stack: Stockfish WASM, Chess.com API, PGN parsing, IndexedDB, ONNX concept model, and concept diff pipeline.
       </p>
