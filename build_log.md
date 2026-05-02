@@ -1,8 +1,8 @@
 # Gambit Build Log
 
 ## Current State
-**Phase**: Feature-complete. Polished. Retrained on real data.
-**Last updated**: 2026-05-02 iteration 14
+**Phase**: Production-ready. All features built, polished, tested.
+**Last updated**: 2026-05-02 iteration 16
 **Build status**: TypeScript clean. 26/26 tests pass. Production build passes.
 **Codebase**: 28 TS files (4114 lines) + 7 Python files (1082 lines) + 11 components + 9 lib modules
 **Repo**: https://github.com/yiheinchai/gambit (12 commits)
@@ -67,11 +67,18 @@
 - [x] postinstall copies Stockfish + ONNX WASM from npm
 - [x] .env.example, README with full docs
 
-### Latest (Iteration 14)
+### Iteration 14
 - [x] Analysis depth presets: Quick Scan (d10/20g), Standard (d14/50g), Deep (d18/100g)
 - [x] Drill keyboard shortcuts: Enter/Space (next), R (retry), Esc (exit)
-- [x] Concept model retrained on 50K real Lichess positions (Jan 2013 DB)
-- [x] All endpoints verified via HTTP smoke tests
+
+### Iteration 15
+- [x] Opening repertoire analysis: 30+ openings detected, per-opening W/D/L stats
+- [x] Opening stats in Progress tab with stacked bars and mistake rate flags
+
+### Iteration 16
+- [x] Returning-user auto-load: localStorage saves last username, "Continue as X" link
+- [x] Final concept model: 50K real Lichess positions, 30 epochs, **96.9% accuracy** (val loss 0.084)
+- [x] All endpoints verified, 26/26 tests pass, production build clean
 
 ## To Deploy
 1. Go to https://vercel.com/new
@@ -80,7 +87,7 @@
 4. Optional env: ANTHROPIC_API_KEY for LLM explanations
 5. Deploy
 
-## File Structure (28 TS + 7 Python)
+## File Structure (30 TS + 8 Python)
 ```
 src/
   app/
