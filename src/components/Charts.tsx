@@ -16,9 +16,9 @@ export function LineChart({
 }: LineChartProps) {
   if (data.length < 2) {
     return (
-      <div className="bg-zinc-800 border border-zinc-700 rounded-lg p-4">
-        <p className="text-zinc-400 text-sm mb-2">{title}</p>
-        <p className="text-zinc-600 text-xs">Not enough data</p>
+      <div style={{ background: "white", border: "3px solid var(--ink)", borderRadius: 20, padding: 16, boxShadow: "0 5px 0 var(--ink)" }}>
+        <p style={{ fontSize: 11, fontWeight: 800, color: "var(--ink-3)", textTransform: "uppercase" as const, letterSpacing: 0.5, marginBottom: 8 }}>{title}</p>
+        <p style={{ fontSize: 12, color: "var(--ink-3)" }}>Not enough data</p>
       </div>
     );
   }
@@ -49,8 +49,8 @@ export function LineChart({
   );
 
   return (
-    <div className="bg-zinc-800 border border-zinc-700 rounded-lg p-4">
-      <p className="text-zinc-400 text-sm mb-2">{title}</p>
+    <div style={{ background: "white", border: "3px solid var(--ink)", borderRadius: 20, padding: 16, boxShadow: "0 5px 0 var(--ink)" }}>
+      <p style={{ fontSize: 11, fontWeight: 800, color: "var(--ink-3)", textTransform: "uppercase" as const, letterSpacing: 0.5, marginBottom: 8 }}>{title}</p>
       <svg viewBox={`0 0 ${width} ${height}`} className="w-full">
         {/* Grid lines */}
         {yTickValues.map((v, i) => {
@@ -62,10 +62,10 @@ export function LineChart({
                 y1={y}
                 x2={width - padding.right}
                 y2={y}
-                stroke="#3f3f46"
+                stroke="var(--line)"
                 strokeWidth={0.5}
               />
-              <text x={padding.left - 5} y={y + 3} textAnchor="end" fill="#71717a" fontSize={9}>
+              <text x={padding.left - 5} y={y + 3} textAnchor="end" fill="var(--ink-3)" fontSize={9}>
                 {valueFormat(v)}
               </text>
             </g>
@@ -86,7 +86,7 @@ export function LineChart({
                 x={points[i].x}
                 y={height - 3}
                 textAnchor="middle"
-                fill="#71717a"
+                fill="var(--ink-3)"
                 fontSize={7}
               >
                 {d.label}
@@ -98,7 +98,7 @@ export function LineChart({
                 x={points[i].x}
                 y={height - 3}
                 textAnchor="middle"
-                fill="#71717a"
+                fill="var(--ink-3)"
                 fontSize={8}
               >
                 {data[i].label}
@@ -121,12 +121,12 @@ export function BarChart({ data, height = 140, title }: BarChartProps) {
   const maxVal = Math.max(...data.map((d) => d.value), 1);
 
   return (
-    <div className="bg-zinc-800 border border-zinc-700 rounded-lg p-4">
-      <p className="text-zinc-400 text-sm mb-3">{title}</p>
+    <div style={{ background: "white", border: "3px solid var(--ink)", borderRadius: 20, padding: 16, boxShadow: "0 5px 0 var(--ink)" }}>
+      <p style={{ fontSize: 11, fontWeight: 800, color: "var(--ink-3)", textTransform: "uppercase" as const, letterSpacing: 0.5, marginBottom: 12 }}>{title}</p>
       <div className="flex items-end gap-2" style={{ height }}>
         {data.map((d, i) => (
           <div key={i} className="flex-1 flex flex-col items-center">
-            <span className="text-white text-xs font-medium mb-1">{d.value}</span>
+            <span style={{ fontSize: 12, fontWeight: 900, color: "var(--ink)", marginBottom: 4 }}>{d.value}</span>
             <div
               className="w-full rounded-t"
               style={{
@@ -135,7 +135,7 @@ export function BarChart({ data, height = 140, title }: BarChartProps) {
                 minHeight: d.value > 0 ? 4 : 0,
               }}
             />
-            <span className="text-zinc-500 text-xs mt-1 truncate w-full text-center">
+            <span style={{ fontSize: 11, fontWeight: 700, color: "var(--ink-3)", marginTop: 4, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" as const, textAlign: "center" as const }}>
               {d.label}
             </span>
           </div>
