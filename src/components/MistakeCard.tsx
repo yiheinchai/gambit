@@ -1,4 +1,3 @@
-"use client";
 
 import { Chessboard } from "react-chessboard";
 import type { StoredMistake } from "@/lib/db";

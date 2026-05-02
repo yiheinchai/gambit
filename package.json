@@ -3,31 +3,34 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
     "lint": "eslint",
     "test": "npx tsx src/lib/__tests__/stockfish-smoke.test.ts && npx tsx src/lib/__tests__/clustering-smoke.test.ts && npx tsx src/lib/__tests__/progress-smoke.test.ts",
     "test:e2e": "npx tsx src/lib/__tests__/smoke.test.ts",
     "postinstall": "mkdir -p public/stockfish public/onnx public/models && cp node_modules/stockfish/bin/stockfish-18-lite-single.js public/stockfish/ && cp node_modules/stockfish/bin/stockfish-18-lite-single.wasm public/stockfish/stockfish.wasm && cp node_modules/onnxruntime-web/dist/ort-wasm-simd-threaded.wasm public/onnx/"
   },
   "dependencies": {
+    "@tanstack/react-router": "^1.169.1",
+    "@tanstack/react-router-devtools": "^1.166.13",
+    "@vitejs/plugin-react": "^6.0.1",
     "chess.js": "^1.4.0",
     "idb": "^8.0.3",
-    "next": "16.2.4",
     "onnxruntime-web": "^1.25.1",
     "react": "19.2.4",
     "react-chessboard": "^5.10.0",
     "react-dom": "19.2.4",
-    "stockfish": "^18.0.7"
+    "stockfish": "^18.0.7",
+    "vite": "^8.0.10"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
+    "@tanstack/router-plugin": "^1.167.32",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
-    "eslint-config-next": "16.2.4",
     "tailwindcss": "^4",
     "typescript": "^5"
   }

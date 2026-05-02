@@ -1,4 +1,3 @@
-"use client";
 
 import { useState } from "react";
 
@@ -37,7 +36,8 @@ export default function DebugPage() {
     update("Stockfish JS loads", { status: "running" });
     try {
       const t0 = performance.now();
-      const worker = new Worker("/stockfish/stockfish-18-lite-single.js");
+      const base = import.meta.env.BASE_URL || "/";
+      const worker = new Worker(`${base}stockfish/stockfish-18-lite-single.js`);
       await new Promise<void>((resolve, reject) => {
         const timeout = setTimeout(() => reject(new Error("Timeout after 10s")), 10000);
         worker.onmessage = (e) => {

@@ -1,4 +1,3 @@
-"use client";
 
 import { useState, useEffect, useRef } from "react";
 import type { AnalysisProgress as AnalysisProgressType } from "@/lib/analysis";

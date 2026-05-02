@@ -18,6 +18,8 @@ export interface MistakeInfo {
   gamePhase: "opening" | "middlegame" | "endgame";
 }
 
+import { assetUrl } from "./base-path";
+
 type MessageHandler = (data: string) => void;
 
 export class StockfishEngine {
@@ -28,7 +30,7 @@ export class StockfishEngine {
   async init(): Promise<void> {
     if (this.worker) return;
 
-    this.worker = new Worker("/stockfish/stockfish-18-lite-single.js");
+    this.worker = new Worker(assetUrl("stockfish/stockfish-18-lite-single.js"));
 
     return new Promise((resolve) => {
       this.worker!.onmessage = (e) => {

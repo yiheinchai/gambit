@@ -1,5 +1,6 @@
 import * as ort from "onnxruntime-web";
 import { Chess } from "chess.js";
+import { assetUrl } from "./base-path";
 
 const CONCEPT_NAMES = [
   "fork_possible",
@@ -108,13 +109,13 @@ let modelVersion: string | null = null;
 
 async function getSession(): Promise<ort.InferenceSession> {
   if (!session) {
-    ort.env.wasm.wasmPaths = "/onnx/";
-    session = await ort.InferenceSession.create("/models/concept_classifier.onnx", {
+    ort.env.wasm.wasmPaths = assetUrl("onnx/");
+    session = await ort.InferenceSession.create(assetUrl("models/concept_classifier.onnx"), {
       executionProviders: ["wasm"],
     });
     // Load model version from manifest
     try {
-      const res = await fetch("/models/concepts.json");
+      const res = await fetch(assetUrl("models/concepts.json"));
       if (res.ok) {
         const manifest = await res.json();
         modelVersion = `${manifest.params}-${manifest.concept_dim}`;
@@ -213,7 +214,7 @@ export async function isModelAvailable(): Promise<boolean> {
     return false;
   }
   try {
-    const res = await fetch("/models/concept_classifier.onnx", { method: "HEAD" });
+    const res = await fetch(assetUrl("models/concept_classifier.onnx"), { method: "HEAD" });
     modelAvailable = res.ok;
   } catch {
     modelAvailable = false;

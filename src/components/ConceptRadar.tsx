@@ -1,4 +1,3 @@
-"use client";
 
 import type { StoredMistake } from "@/lib/db";
 import { CONCEPT_NAMES } from "@/lib/concept-classifier";

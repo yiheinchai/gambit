@@ -1,4 +1,3 @@
-"use client";
 
 import type { OpeningStats as OpeningStatsType } from "@/lib/openings";
 
