@@ -18,8 +18,6 @@ export interface AnalysisProgress {
   mistakesFound: number;
 }
 
-export type ProgressCallback = (progress: AnalysisProgress) => void;
-
 export async function analyzeAndStoreGame(
   game: ParsedGame,
   username: string,
