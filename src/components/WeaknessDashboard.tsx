@@ -9,6 +9,7 @@ import GameReview from "./GameReview";
 import WeaknessClusterCard from "./WeaknessClusterCard";
 import DrillMode from "./DrillMode";
 import ConceptRadar from "./ConceptRadar";
+import DrillSchedule from "./DrillSchedule";
 
 interface Props {
   mistakes: StoredMistake[];
@@ -24,6 +25,7 @@ export default function WeaknessDashboard({
   const [selectedMistake, setSelectedMistake] = useState<StoredMistake | null>(null);
   const [drillCluster, setDrillCluster] = useState<WeaknessCluster | null>(null);
   const [expandedCluster, setExpandedCluster] = useState<WeaknessCluster | null>(null);
+  const [scheduleKey, setScheduleKey] = useState(0);
 
   const stats = aggregateMistakeStats(mistakes);
   const clusters = useMemo(() => clusterMistakes(mistakes), [mistakes]);
@@ -44,7 +46,10 @@ export default function WeaknessDashboard({
       {drillCluster && (
         <DrillMode
           cluster={drillCluster}
-          onClose={() => setDrillCluster(null)}
+          onClose={() => {
+            setDrillCluster(null);
+            setScheduleKey((k) => k + 1);
+          }}
         />
       )}
 
@@ -104,6 +109,16 @@ export default function WeaknessDashboard({
             ))}
           </div>
         </section>
+      )}
+
+      {/* Drill Schedule */}
+      {clusters.length > 0 && (
+        <DrillSchedule
+          key={scheduleKey}
+          clusters={clusters}
+          username={username}
+          onDrill={setDrillCluster}
+        />
       )}
 
       {/* Expanded cluster view */}
