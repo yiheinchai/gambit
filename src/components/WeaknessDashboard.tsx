@@ -13,6 +13,7 @@ import DrillMode from "./DrillMode";
 import ConceptRadar from "./ConceptRadar";
 import DrillSchedule from "./DrillSchedule";
 import PuzzleMode from "./PuzzleMode";
+import DashboardHero from "./DashboardHero";
 
 interface Props {
   mistakes: StoredMistake[];
@@ -70,59 +71,30 @@ export default function WeaknessDashboard({
         />
       )}
 
-      {/* Header */}
-      <div className="text-center">
-        <h2 className="text-3xl font-bold text-white mb-1">{username}</h2>
-        <p className="text-zinc-400">{totalGames} games analyzed</p>
-      </div>
+      {/* Hero banner + metrics */}
+      <DashboardHero
+        username={username}
+        totalGames={totalGames}
+        totalMistakes={stats.total}
+        eloPrediction={eloPrediction}
+        topCluster={clusters[0]}
+        onDrillTop={() => clusters[0] && setDrillCluster(clusters[0])}
+      />
 
-      {/* Cold start: not enough data for meaningful patterns */}
+      {/* Cold start */}
       {totalGames > 0 && totalGames < 10 && (
-        <div className="bg-blue-900/20 border border-blue-700/30 rounded-lg p-4 text-center">
-          <p className="text-blue-300 text-sm font-medium mb-1">
+        <div style={{
+          background: "#E8F8E5", border: "2px solid var(--green)", borderRadius: 16,
+          padding: 16, textAlign: "center",
+        }}>
+          <p style={{ color: "var(--green-dark)", fontSize: 14, fontWeight: 700, marginBottom: 4 }}>
             Limited data ({totalGames} games)
           </p>
-          <p className="text-zinc-400 text-sm">
-            Weakness patterns become more accurate with 20+ games. The individual mistakes below are still useful — come back after more games for pattern detection.
+          <p style={{ color: "var(--ink-2)", fontSize: 13 }}>
+            Patterns improve with 20+ games. Individual mistakes below are still useful.
           </p>
         </div>
       )}
-
-      {mistakes.length === 0 && totalGames > 0 && (
-        <div className="bg-green-900/20 border border-green-700/30 rounded-lg p-4 text-center">
-          <p className="text-green-300 text-sm font-medium">No significant mistakes found</p>
-          <p className="text-zinc-400 text-sm">
-            Try the Deep analysis preset for more thorough detection, or you&apos;re playing very clean chess.
-          </p>
-        </div>
-      )}
-
-      {/* Stats row */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <StatCard label="Total Mistakes" value={stats.total} />
-        <StatCard
-          label="Avg CP Loss"
-          value={Math.round(stats.avgCpLoss)}
-          suffix="cp"
-        />
-        <StatCard
-          label="Blunders"
-          value={stats.bySeverity.blunder}
-          color="text-red-400"
-        />
-        <StatCard
-          label="Mistakes"
-          value={stats.bySeverity.mistake}
-          color="text-orange-400"
-        />
-      </div>
-
-      {/* Phase breakdown */}
-      <div className="grid grid-cols-3 gap-2 sm:gap-4">
-        <PhaseCard label="Opening" count={stats.byPhase.opening} total={stats.total} />
-        <PhaseCard label="Middlegame" count={stats.byPhase.middlegame} total={stats.total} />
-        <PhaseCard label="Endgame" count={stats.byPhase.endgame} total={stats.total} />
-      </div>
 
       {/* Concept Radar */}
       <ConceptRadar mistakes={mistakes} />
