@@ -2,7 +2,7 @@
 import { useState, useCallback, useRef, useEffect } from "react";
 import { type AnalysisConfig } from "@/components/UsernameForm";
 import LandingPage from "@/components/LandingPage";
-import AnalysisProgressComponent from "@/components/AnalysisProgress";
+import DuoLoadingScreen from "@/components/DuoLoadingScreen";
 import WeaknessDashboard from "@/components/WeaknessDashboard";
 import ProgressView from "@/components/ProgressView";
 import {
@@ -207,56 +207,13 @@ export default function Home() {
       )}
 
       {state === "loading" && (
-        <div className="flex-1 flex items-center justify-center w-full">
-          <div className="w-full max-w-lg">
-            <AnalysisProgressComponent progress={progress} />
-
-            {/* Action buttons during analysis */}
-            <div className="flex justify-center gap-3 mt-6">
-              {mistakes.length >= 3 && (
-                <button
-                  onClick={showResults}
-                  className="px-4 py-2 bg-amber-600 hover:bg-amber-500 text-white text-sm font-medium rounded-lg transition-colors"
-                >
-                  View Results So Far ({mistakes.length} mistakes)
-                </button>
-              )}
-              <button
-                onClick={handleCancel}
-                className="px-4 py-2 bg-zinc-700 hover:bg-zinc-600 text-zinc-300 text-sm rounded-lg transition-colors"
-              >
-                Stop Analysis
-              </button>
-            </div>
-
-            {mistakes.length > 0 && (
-              <div className="mt-6">
-                <p className="text-zinc-500 text-sm mb-3">
-                  Recent finds:
-                </p>
-                <div className="space-y-2 max-h-48 overflow-y-auto">
-                  {mistakes.slice(-5).map((m) => (
-                    <div
-                      key={m.id}
-                      className="text-xs text-zinc-400 bg-zinc-800 rounded px-3 py-2 flex justify-between"
-                    >
-                      <span>
-                        Move {m.moveNumber}: {m.movePlayed} instead of {m.bestMove}
-                      </span>
-                      <span className={
-                        m.severity === "blunder" ? "text-red-400" :
-                        m.severity === "mistake" ? "text-orange-400" :
-                        "text-yellow-400"
-                      }>
-                        -{m.centipawnLoss}cp
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
+        <DuoLoadingScreen
+          progress={progress}
+          username={username}
+          mistakes={mistakes}
+          onStop={handleCancel}
+          onViewPartial={showResults}
+        />
       )}
 
       {state === "results" && (

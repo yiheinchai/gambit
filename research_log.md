@@ -87,6 +87,7 @@ Training on MPS, 30 epochs, ~67s/epoch.
 | 5     | 8.8%      | 9.6%    | 20.2%     | 28m |
 | 10    | 15.4%     | 14.5%   | 29.4%     | 23m |
 | 15    | 21.6%     | 16.7%   | 33.0%     | 17m |
+| 18    | 24.3%     | 17.6%   | 34.3%     | 13m |
 
 Observations so far:
 - Transformer approaching CNN's 18.5% with fewer params (1.4M vs 2.4M)
