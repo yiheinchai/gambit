@@ -8,6 +8,7 @@ import MistakeCard from "./MistakeCard";
 import GameReview from "./GameReview";
 import WeaknessClusterCard from "./WeaknessClusterCard";
 import DrillMode from "./DrillMode";
+import ConceptRadar from "./ConceptRadar";
 
 interface Props {
   mistakes: StoredMistake[];
@@ -79,6 +80,9 @@ export default function WeaknessDashboard({
         <PhaseCard label="Middlegame" count={stats.byPhase.middlegame} total={stats.total} />
         <PhaseCard label="Endgame" count={stats.byPhase.endgame} total={stats.total} />
       </div>
+
+      {/* Concept Radar */}
+      <ConceptRadar mistakes={mistakes} />
 
       {/* Weakness Clusters */}
       {clusters.length > 0 && (
