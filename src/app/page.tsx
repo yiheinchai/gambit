@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useCallback, useRef } from "react";
-import UsernameForm from "@/components/UsernameForm";
+import UsernameForm, { type AnalysisConfig } from "@/components/UsernameForm";
 import AnalysisProgressComponent from "@/components/AnalysisProgress";
 import WeaknessDashboard from "@/components/WeaknessDashboard";
 import ProgressView from "@/components/ProgressView";
@@ -52,7 +52,8 @@ export default function Home() {
     showResults();
   }, [showResults]);
 
-  const handleAnalyze = useCallback(async (name: string) => {
+  const handleAnalyze = useCallback(async (config: AnalysisConfig) => {
+    const { username: name, depth, gameCount } = config;
     setUsername(name);
     setState("loading");
     setError(null);
@@ -68,7 +69,7 @@ export default function Home() {
       const cachedGames = await getGamesByUsername(name.toLowerCase());
       const cachedMistakes = await getMistakesByUsername(name.toLowerCase());
 
-      const rawGames = await fetchRecentGames(name, 50);
+      const rawGames = await fetchRecentGames(name, gameCount);
       if (rawGames.length === 0) {
         setError(`No games found for "${name}". Make sure the profile is public and has recent games.`);
         setState("idle");
@@ -118,7 +119,8 @@ export default function Home() {
               currentMove: current,
               totalMoves: total,
             }));
-          }
+          },
+          depth
         );
 
         allMistakes.push(...gameMistakes);

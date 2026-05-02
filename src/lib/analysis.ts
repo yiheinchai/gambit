@@ -23,7 +23,8 @@ export type ProgressCallback = (progress: AnalysisProgress) => void;
 export async function analyzeAndStoreGame(
   game: ParsedGame,
   username: string,
-  onProgress?: (current: number, total: number) => void
+  onProgress?: (current: number, total: number) => void,
+  depth: number = 14
 ): Promise<StoredMistake[]> {
   const engine = getEngine();
   await engine.init();
@@ -32,7 +33,7 @@ export async function analyzeAndStoreGame(
     game.fens,
     game.moves,
     game.playerColor,
-    16,
+    depth,
     onProgress
   );
 
