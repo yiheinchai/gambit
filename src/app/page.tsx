@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useRef } from "react";
+import { useState, useCallback, useRef, useEffect } from "react";
 import UsernameForm, { type AnalysisConfig } from "@/components/UsernameForm";
 import AnalysisProgressComponent from "@/components/AnalysisProgress";
 import WeaknessDashboard from "@/components/WeaknessDashboard";
@@ -41,6 +41,26 @@ export default function Home() {
   const [openingStats, setOpeningStats] = useState<OpeningStats[]>([]);
   const [error, setError] = useState<string | null>(null);
   const cancelledRef = useRef(false);
+  const [lastUser, setLastUser] = useState<string | null>(null);
+
+  // Check for previously analyzed user on mount
+  useEffect(() => {
+    const saved = localStorage.getItem("gambit_last_user");
+    if (saved) setLastUser(saved);
+  }, []);
+
+  const loadCachedUser = useCallback(async (name: string) => {
+    const cachedGames = await getGamesByUsername(name.toLowerCase());
+    const cachedMistakes = await getMistakesByUsername(name.toLowerCase());
+    if (cachedGames.length === 0) return;
+
+    setUsername(name);
+    setGames(cachedGames);
+    setMistakes(cachedMistakes);
+    setProgressData(computeProgress(cachedGames, cachedMistakes));
+    setOpeningStats(computeOpeningStats(cachedGames, cachedMistakes));
+    setState("results");
+  }, []);
 
   const showResults = useCallback(() => {
     if (mistakes.length > 0 && games.length > 0) {
@@ -64,6 +84,7 @@ export default function Home() {
     setGames([]);
     setTab("weaknesses");
     cancelledRef.current = false;
+    localStorage.setItem("gambit_last_user", name);
 
     try {
       setProgress((p) => ({ ...p, phase: "fetching" }));
@@ -180,7 +201,17 @@ export default function Home() {
 
       {state === "idle" && (
         <div className="flex-1 flex items-center justify-center w-full">
-          <UsernameForm onSubmit={handleAnalyze} loading={false} />
+          <div className="flex flex-col items-center gap-4">
+            <UsernameForm onSubmit={handleAnalyze} loading={false} />
+            {lastUser && (
+              <button
+                onClick={() => loadCachedUser(lastUser)}
+                className="text-zinc-500 hover:text-amber-400 text-sm transition-colors"
+              >
+                Continue as <span className="font-medium text-zinc-300">{lastUser}</span>
+              </button>
+            )}
+          </div>
         </div>
       )}
 
