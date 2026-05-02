@@ -57,82 +57,73 @@ export default function GameReview({ mistake, onClose }: Props) {
   const evalPercent = ((evalBar + 500) / 1000) * 100;
 
   return (
-    <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
-      <div className="bg-zinc-800 rounded-xl border border-zinc-700 max-w-3xl w-full max-h-[90vh] overflow-y-auto">
-        <div className="flex justify-between items-center p-4 border-b border-zinc-700">
-          <div>
-            <span className="text-zinc-400 text-sm">Move {mistake.moveNumber}</span>
-            <span className="mx-2 text-zinc-600">|</span>
-            <span
-              className={`text-sm font-medium ${
-                mistake.severity === "blunder"
-                  ? "text-red-400"
-                  : mistake.severity === "mistake"
-                  ? "text-orange-400"
-                  : "text-yellow-400"
-              }`}
-            >
+    <div style={{ position: "fixed", inset: 0, background: "rgba(27,39,48,0.85)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 50, padding: 16 }}>
+      <div style={{ background: "white", border: "3px solid var(--ink)", borderRadius: 24, boxShadow: "0 8px 0 var(--ink)", maxWidth: 720, width: "100%", maxHeight: "90vh", overflow: "auto" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "16px 20px", borderBottom: "2px solid var(--line)" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+            <span style={{ fontSize: 13, color: "var(--ink-3)", fontWeight: 700 }}>Move {mistake.moveNumber}</span>
+            <span style={{
+              background: mistake.severity === "blunder" ? "var(--orange)" : mistake.severity === "mistake" ? "var(--red)" : "var(--yellow)",
+              color: "white", padding: "2px 8px", borderRadius: 6, fontSize: 10, fontWeight: 900, textTransform: "uppercase", letterSpacing: 0.6,
+            }}>
               {mistake.severity} (-{mistake.centipawnLoss}cp)
             </span>
           </div>
           <button
             onClick={onClose}
-            className="text-zinc-500 hover:text-white text-xl leading-none"
+            style={{ background: "var(--bg-2)", border: "2px solid var(--line)", borderRadius: 10, width: 36, height: 36, display: "grid", placeItems: "center", cursor: "pointer", fontWeight: 900, fontSize: 16, fontFamily: "var(--sans)", color: "var(--ink-2)" }}
           >
-            x
+            ✕
           </button>
         </div>
 
-        <div className="p-4 sm:p-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+        <div style={{ padding: "16px 24px 24px" }}>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20 }}>
             {/* Position before the mistake */}
             <div>
-              <p className="text-zinc-400 text-sm mb-2 text-center">
+              <p style={{ fontSize: 13, color: "var(--ink-3)", marginBottom: 8, textAlign: "center", fontWeight: 600 }}>
                 Position ({sideToMove} to move)
               </p>
-              <div className="aspect-square max-w-sm mx-auto">
+              <div style={{ maxWidth: 320 }}>
                 <Chessboard
                   options={{
                     position: showBestMove ? bestMoveFen : mistake.fen,
                     allowDragging: false,
-                    darkSquareStyle: { backgroundColor: "#779952" },
-                    lightSquareStyle: { backgroundColor: "#edeed1" },
+                    darkSquareStyle: { backgroundColor: "#7FA650" },
+                    lightSquareStyle: { backgroundColor: "#EFEFD0" },
                   }}
                 />
               </div>
             </div>
 
             {/* Analysis panel */}
-            <div className="flex flex-col justify-center space-y-4">
+            <div style={{ display: "flex", flexDirection: "column", justifyContent: "center", gap: 16 }}>
               <div>
-                <p className="text-zinc-500 text-xs uppercase tracking-wider mb-1">
+                <p style={{ fontSize: 11, fontWeight: 800, color: "var(--ink-3)", textTransform: "uppercase", letterSpacing: 0.5, marginBottom: 4 }}>
                   You played
                 </p>
-                <p className="text-red-400 font-mono text-lg">
+                <p style={{ fontSize: 20, fontFamily: "var(--mono)", fontWeight: 900, color: "var(--orange-dark)" }}>
                   {mistake.movePlayed}
                 </p>
               </div>
 
               <div>
-                <p className="text-zinc-500 text-xs uppercase tracking-wider mb-1">
+                <p style={{ fontSize: 11, fontWeight: 800, color: "var(--ink-3)", textTransform: "uppercase", letterSpacing: 0.5, marginBottom: 4 }}>
                   Best move
                 </p>
-                <p className="text-green-400 font-mono text-lg">
+                <p style={{ fontSize: 20, fontFamily: "var(--mono)", fontWeight: 900, color: "var(--green-dark)" }}>
                   {mistake.bestMove}
                 </p>
               </div>
 
               <div>
-                <p className="text-zinc-500 text-xs uppercase tracking-wider mb-1">
+                <p style={{ fontSize: 11, fontWeight: 800, color: "var(--ink-3)", textTransform: "uppercase", letterSpacing: 0.5, marginBottom: 4 }}>
                   Evaluation shift
                 </p>
-                <div className="w-full bg-zinc-900 rounded-full h-4 overflow-hidden">
-                  <div
-                    className="h-full bg-gradient-to-r from-zinc-600 to-white transition-all"
-                    style={{ width: `${evalPercent}%` }}
-                  />
+                <div style={{ width: "100%", height: 16, background: "var(--bg-2)", borderRadius: 8, overflow: "hidden", border: "1.5px solid var(--line)" }}>
+                  <div style={{ width: `${evalPercent}%`, height: "100%", background: "var(--ink)", borderRadius: 8, transition: "width 300ms" }} />
                 </div>
-                <div className="flex justify-between text-xs text-zinc-500 mt-1">
+                <div style={{ display: "flex", justifyContent: "space-between", fontSize: 11, fontFamily: "var(--mono)", color: "var(--ink-3)", marginTop: 4 }}>
                   <span>Before: {(mistake.evalBefore / 100).toFixed(1)}</span>
                   <span>After: {(mistake.evalAfter / 100).toFixed(1)}</span>
                 </div>
@@ -141,45 +132,50 @@ export default function GameReview({ mistake, onClose }: Props) {
               {/* Concept tags */}
               {mistake.conceptDiff && mistake.conceptDiff.length > 0 && (
                 <div>
-                  <p className="text-zinc-500 text-xs uppercase tracking-wider mb-1.5">
+                  <p style={{ fontSize: 11, fontWeight: 800, color: "var(--ink-3)", textTransform: "uppercase", letterSpacing: 0.5, marginBottom: 6 }}>
                     What you missed
                   </p>
-                  <div className="flex flex-wrap gap-1.5">
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
                     {mistake.conceptDiff
                       .map((val, idx) => ({ idx, val }))
-                      .filter((c) => c.val > 0.2)
+                      .filter((c) => c.val > 0.1)
                       .sort((a, b) => b.val - a.val)
                       .slice(0, 4)
                       .map((c) => (
-                        <span
-                          key={c.idx}
-                          className="px-2 py-1 bg-amber-900/30 border border-amber-700/30 text-amber-400 text-xs rounded"
-                        >
-                          {CONCEPT_DISPLAY[c.idx] || `concept_${c.idx}`}
+                        <span key={c.idx} style={{
+                          padding: "3px 8px", background: "#FFF4E5", border: "1.5px solid var(--orange)",
+                          borderRadius: 6, fontSize: 11, fontFamily: "var(--mono)", fontWeight: 700, color: "var(--orange-dark)",
+                        }}>
+                          {CONCEPT_DISPLAY[c.idx] || `feature_${c.idx}`}
                         </span>
                       ))}
                   </div>
                 </div>
               )}
 
-              <div className="flex gap-2 pt-2">
+              <div style={{ display: "flex", gap: 8, paddingTop: 8 }}>
                 <button
                   onClick={() => setShowBestMove(false)}
-                  className={`px-3 py-1.5 rounded text-sm ${
-                    !showBestMove
-                      ? "bg-zinc-600 text-white"
-                      : "bg-zinc-900 text-zinc-500 hover:text-zinc-300"
-                  }`}
+                  style={{
+                    padding: "8px 14px", borderRadius: 10, fontSize: 13, fontWeight: 800, cursor: "pointer",
+                    background: !showBestMove ? "var(--ink)" : "white",
+                    color: !showBestMove ? "white" : "var(--ink-2)",
+                    border: !showBestMove ? "2px solid var(--ink)" : "2px solid var(--line)",
+                    fontFamily: "var(--sans)",
+                  }}
                 >
                   Position
                 </button>
                 <button
                   onClick={() => setShowBestMove(true)}
-                  className={`px-3 py-1.5 rounded text-sm ${
-                    showBestMove
-                      ? "bg-green-700 text-white"
-                      : "bg-zinc-900 text-zinc-500 hover:text-zinc-300"
-                  }`}
+                  style={{
+                    padding: "8px 14px", borderRadius: 10, fontSize: 13, fontWeight: 800, cursor: "pointer",
+                    background: showBestMove ? "var(--green)" : "white",
+                    color: showBestMove ? "white" : "var(--ink-2)",
+                    border: showBestMove ? "2px solid var(--green-dark)" : "2px solid var(--line)",
+                    boxShadow: showBestMove ? "0 2px 0 var(--green-dark)" : "none",
+                    fontFamily: "var(--sans)",
+                  }}
                 >
                   Show Best Move
                 </button>
