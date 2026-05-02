@@ -170,8 +170,15 @@ Experiment 3 showed that depth doesn't help with limited data. The bottleneck is
 - Training: 25 epochs, batch 512, lr 5e-4, cosine schedule
 - Saves to `models/exp4/` to avoid overwriting production checkpoint
 
-### Status
-*(training started, checking progress on each loop iteration)*
+### Progress
+| Epoch | Train Acc | Val Acc | Val Top-3 | ETA |
+|-------|-----------|---------|-----------|-----|
+| 4     | 8.9%      | 10.5%   | 22.0%     | 47m |
+| 6     | 13.2%     | 13.9%   | 28.2%     | 43m |
+| 8     | 16.4%     | 16.6%   | 32.4%     | 36m |
+| 9     | 17.8%     | 17.3%   | 34.1%     | 34m |
+
+Already surpassing Exp 2 at same epoch count. Trend suggests >20% peak.
 
 ### Results
 *(pending)*
