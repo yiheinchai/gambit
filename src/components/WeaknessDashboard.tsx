@@ -17,6 +17,8 @@ import DashboardHero from "./DashboardHero";
 import TopNav from "./TopNav";
 import DuoWeaknessCard from "./DuoWeaknessCard";
 import WeaknessDetail from "./WeaknessDetail";
+import GameReviewScreen from "./GameReviewScreen";
+import { getMistakesByGameId } from "@/lib/db";
 
 interface Props {
   mistakes: StoredMistake[];
@@ -42,6 +44,7 @@ export default function WeaknessDashboard({
   const [puzzleCluster, setPuzzleCluster] = useState<WeaknessCluster | null>(null);
   const [expandedCluster, setExpandedCluster] = useState<WeaknessCluster | null>(null);
   const [detailCluster, setDetailCluster] = useState<{ cluster: WeaknessCluster; rank: number } | null>(null);
+  const [reviewGame, setReviewGame] = useState<{ game: StoredGame; mistakes: StoredMistake[] } | null>(null);
   const [scheduleKey, setScheduleKey] = useState(0);
 
   const stats = aggregateMistakeStats(mistakes);
@@ -74,6 +77,14 @@ export default function WeaknessDashboard({
         <PuzzleMode
           cluster={puzzleCluster}
           onClose={() => setPuzzleCluster(null)}
+        />
+      )}
+
+      {reviewGame && (
+        <GameReviewScreen
+          game={reviewGame.game}
+          mistakes={reviewGame.mistakes}
+          onClose={() => setReviewGame(null)}
         />
       )}
 
@@ -147,28 +158,48 @@ export default function WeaknessDashboard({
         />
       )}
 
-      {/* Expanded cluster view */}
-      {expandedCluster && (
+      {/* Recent Games */}
+      {games.length > 0 && (
         <section>
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-xl font-semibold text-white">
-              {expandedCluster.label} — All Positions
-            </h3>
-            <button
-              onClick={() => setExpandedCluster(null)}
-              className="text-zinc-500 hover:text-zinc-300 text-sm"
-            >
-              Collapse
-            </button>
-          </div>
-          <div className="space-y-3">
-            {expandedCluster.mistakes.map((m) => (
-              <MistakeCard
-                key={m.id}
-                mistake={m}
-                onClick={() => setSelectedMistake(m)}
-              />
-            ))}
+          <h2 style={{ fontSize: 22, fontWeight: 900, letterSpacing: -0.5, marginBottom: 14, color: "var(--ink)" }}>Recent games</h2>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: 10 }}>
+            {games.slice(0, 8).map(g => {
+              const gameMistakes = mistakes.filter(m => m.gameId === g.id);
+              return (
+                <div
+                  key={g.id}
+                  onClick={async () => {
+                    const ms = await getMistakesByGameId(g.id);
+                    setReviewGame({ game: g, mistakes: ms.length > 0 ? ms : gameMistakes });
+                  }}
+                  style={{
+                    background: "white", border: "2px solid var(--line)", borderRadius: 14,
+                    padding: 14, cursor: "pointer", display: "flex", alignItems: "center", gap: 12,
+                    transition: "box-shadow 80ms",
+                  }}
+                  onMouseEnter={e => { (e.currentTarget as HTMLElement).style.boxShadow = "0 4px 0 var(--ink)"; }}
+                  onMouseLeave={e => { (e.currentTarget as HTMLElement).style.boxShadow = "none"; }}
+                >
+                  <div style={{
+                    width: 40, height: 40, borderRadius: 10, flexShrink: 0,
+                    background: g.result === "win" ? "var(--green)" : g.result === "loss" ? "var(--red)" : "var(--bg-2)",
+                    color: g.result === "draw" ? "var(--ink)" : "white",
+                    display: "grid", placeItems: "center", fontWeight: 900, fontSize: 14,
+                    boxShadow: g.result === "win" ? "0 3px 0 var(--green-dark)" : g.result === "loss" ? "0 3px 0 #A8281C" : "none",
+                  }}>
+                    {g.result === "win" ? "W" : g.result === "loss" ? "L" : "D"}
+                  </div>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontSize: 13, fontWeight: 800, color: "var(--ink)" }}>
+                      vs {g.opponentElo} · {g.playerColor}
+                    </div>
+                    <div style={{ fontSize: 10, fontFamily: "var(--mono)", color: "var(--ink-3)" }}>
+                      {gameMistakes.length} mistakes · {g.moves.length} moves · {new Date(g.date).toLocaleDateString()}
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </section>
       )}

@@ -245,7 +245,7 @@ export default function Home() {
             />
           )}
 
-          <div className="mt-8 text-center">
+          <div style={{ marginTop: 32, display: "flex", justifyContent: "center", gap: 16 }}>
             <button
               onClick={() => {
                 setState("idle");
@@ -253,9 +253,28 @@ export default function Home() {
                 setGames([]);
                 setProgressData(null);
               }}
-              className="text-zinc-500 hover:text-zinc-300 text-sm underline"
+              style={{ fontSize: 13, color: "var(--ink-3)", fontWeight: 600, cursor: "pointer", background: "none", border: "none", fontFamily: "var(--sans)", textDecoration: "underline" }}
             >
               Analyze a different player
+            </button>
+            <button
+              onClick={async () => {
+                const { getDB } = await import("@/lib/db");
+                const db = await getDB();
+                const tx = db.transaction(["games", "mistakes", "clusters", "drillProgress", "explanationCache"], "readwrite");
+                for (const name of ["games", "mistakes", "clusters", "drillProgress", "explanationCache"] as const) {
+                  await tx.objectStore(name).clear();
+                }
+                await tx.done;
+                localStorage.removeItem("gambit_last_user");
+                setState("idle");
+                setMistakes([]);
+                setGames([]);
+                setProgressData(null);
+              }}
+              style={{ fontSize: 13, color: "var(--red)", fontWeight: 600, cursor: "pointer", background: "none", border: "none", fontFamily: "var(--sans)", textDecoration: "underline" }}
+            >
+              Clear cache & start fresh
             </button>
           </div>
         </div>
