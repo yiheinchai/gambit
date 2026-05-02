@@ -14,6 +14,8 @@ import ConceptRadar from "./ConceptRadar";
 import DrillSchedule from "./DrillSchedule";
 import PuzzleMode from "./PuzzleMode";
 import DashboardHero from "./DashboardHero";
+import TopNav from "./TopNav";
+import DuoWeaknessCard from "./DuoWeaknessCard";
 
 interface Props {
   mistakes: StoredMistake[];
@@ -71,6 +73,9 @@ export default function WeaknessDashboard({
         />
       )}
 
+      {/* Top nav */}
+      <TopNav active="weaknesses" username={username} />
+
       {/* Hero banner + metrics */}
       <DashboardHero
         username={username}
@@ -99,23 +104,20 @@ export default function WeaknessDashboard({
       {/* Concept Radar */}
       <ConceptRadar mistakes={mistakes} />
 
-      {/* Weakness Clusters */}
+      {/* Weakness Cards — Duo style */}
       {clusters.length > 0 && (
         <section>
-          <h3 className="text-xl font-semibold text-white mb-2">
-            Your Weakness Patterns
-          </h3>
-          <p className="text-zinc-500 text-sm mb-4">
-            Recurring mistake patterns across your games, ranked by impact.
-          </p>
-          <div className="space-y-4">
-            {clusters.slice(0, 5).map((cluster) => (
-              <WeaknessClusterCard
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
+            <h2 style={{ fontSize: 22, fontWeight: 900, letterSpacing: -0.5, margin: 0, color: "var(--ink)" }}>Your weaknesses, ranked</h2>
+          </div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+            {clusters.slice(0, 5).map((cluster, i) => (
+              <DuoWeaknessCard
                 key={cluster.id}
                 cluster={cluster}
-                onDrill={setDrillCluster}
-                onPuzzle={setPuzzleCluster}
-                onExpand={setExpandedCluster}
+                rank={i + 1}
+                onDrill={() => setDrillCluster(cluster)}
+                onInspect={() => setExpandedCluster(cluster)}
               />
             ))}
           </div>

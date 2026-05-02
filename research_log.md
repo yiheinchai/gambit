@@ -79,6 +79,29 @@ This should produce SAE features that correspond to *tactical* patterns (forks, 
 ### Risk
 Overfitting — transformers are data-hungry and 200K positions may not be enough. Mitigation: dropout=0.1, weight decay, early stopping.
 
+### Status: TRAINING IN PROGRESS
+Training on MPS, 30 epochs, ~67s/epoch.
+
+| Epoch | Train Acc | Val Acc | Val Top-3 | ETA |
+|-------|-----------|---------|-----------|-----|
+| 5     | 8.8%      | 9.6%    | 20.2%     | 28m |
+| 10    | 15.4%     | 14.5%   | 29.4%     | 23m |
+| 15    | 21.6%     | 16.7%   | 33.0%     | 17m |
+
+Observations so far:
+- Transformer approaching CNN's 18.5% with fewer params (1.4M vs 2.4M)
+- Val accuracy plateauing around epoch 14-15 at ~16.8%
+- Still improving — will let it run to completion
+- Early stopping threshold not hit yet
+
+### Results
+*(will complete when training finishes — running SAE pipeline next)*
+
+### Design Implementation
+- Landing page: pixel-accurate implementation of missedtake design (DONE)
+- Dashboard hero banner: green gradient with Elo prediction (DONE)
+- Dashboard weakness cards: in progress (reading design spec)
+
 ---
 
 ## Experiment 3: Planned
