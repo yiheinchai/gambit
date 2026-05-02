@@ -72,13 +72,25 @@
 - [x] README with setup, architecture, training docs
 - [x] 6 commits: 04eea46 → e4125d6 → b3e7cae → 1f1cc83 → ee689c5 → 54dde14
 
-## Remaining
+## Completed
 - [x] Pushed to GitHub: https://github.com/yiheinchai/gambit
-- [x] Concept model trained and wired into analysis pipeline
+- [x] Concept model trained (1.8M params, 90.7% accuracy) and wired in
 - [x] GameReview shows concept tags ("What you missed")
-- [ ] Deploy to Vercel (repo is ready, just needs `vercel deploy`)
+- [x] Concept radar chart on weakness dashboard
+- [x] ONNX model committed to git for Vercel deployment
+- [x] vercel.json configured
+
+## Remaining
+- [ ] Deploy to Vercel: `vercel login` then `vercel deploy --prod` (or import repo at vercel.com/new)
 - [ ] Re-train on real Lichess data for production accuracy
 - [ ] Manual browser test via /debug page
+
+## Vercel Deploy Instructions
+1. Go to https://vercel.com/new
+2. Import the GitHub repo: yiheinchai/gambit
+3. Framework: Next.js (auto-detected)
+4. No env vars needed (ANTHROPIC_API_KEY is optional)
+5. Deploy — postinstall will copy Stockfish + ONNX WASM to public/
 
 ## File Structure (21 TS, 5 Python)
 ```
