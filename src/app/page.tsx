@@ -193,7 +193,11 @@ export default function Home() {
   return (
     <main className="flex-1 flex flex-col items-center px-4 py-12">
       {error && (
-        <div className="mb-6 px-4 py-3 bg-red-900/30 border border-red-800 rounded-lg text-red-300 text-sm max-w-md text-center">
+        <div style={{
+          margin: "0 auto 24px", maxWidth: 500, padding: "14px 20px",
+          background: "#FEECEC", border: "2px solid var(--red)", borderRadius: 14,
+          color: "#A8281C", fontSize: 14, fontWeight: 600, textAlign: "center",
+        }}>
           {error}
         </div>
       )}
@@ -217,20 +221,7 @@ export default function Home() {
       )}
 
       {state === "results" && (
-        <div className="w-full max-w-4xl mx-auto">
-          <div className="flex gap-1 mb-6 bg-zinc-800 rounded-lg p-1 max-w-xs mx-auto">
-            <TabButton
-              label="Weaknesses"
-              active={tab === "weaknesses"}
-              onClick={() => setTab("weaknesses")}
-            />
-            <TabButton
-              label="Progress"
-              active={tab === "progress"}
-              onClick={() => setTab("progress")}
-            />
-          </div>
-
+        <div style={{ maxWidth: 1280, margin: "0 auto", padding: "24px 40px" }}>
           {tab === "weaknesses" && (
             <WeaknessDashboard
               mistakes={mistakes}
@@ -239,6 +230,7 @@ export default function Home() {
               totalGames={games.length}
               openingStats={openingStats}
               eloPrediction={eloPrediction}
+              onNavigate={(t) => setTab(t as Tab)}
             />
           )}
 
@@ -249,6 +241,7 @@ export default function Home() {
               openingStats={openingStats}
               eloPrediction={eloPrediction || undefined}
               onRefresh={() => handleAnalyze({ username, depth: 14, gameCount: 50 })}
+              onNavigate={(t) => setTab(t as Tab)}
             />
           )}
 
@@ -271,25 +264,3 @@ export default function Home() {
   );
 }
 
-function TabButton({
-  label,
-  active,
-  onClick,
-}: {
-  label: string;
-  active: boolean;
-  onClick: () => void;
-}) {
-  return (
-    <button
-      onClick={onClick}
-      className={`flex-1 px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-        active
-          ? "bg-zinc-700 text-white"
-          : "text-zinc-500 hover:text-zinc-300"
-      }`}
-    >
-      {label}
-    </button>
-  );
-}

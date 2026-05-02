@@ -25,6 +25,7 @@ interface Props {
   totalGames: number;
   openingStats?: OpeningStats[];
   eloPrediction?: EloPrediction | null;
+  onNavigate?: (tab: string) => void;
 }
 
 export default function WeaknessDashboard({
@@ -34,6 +35,7 @@ export default function WeaknessDashboard({
   totalGames,
   openingStats = [],
   eloPrediction,
+  onNavigate,
 }: Props) {
   const [selectedMistake, setSelectedMistake] = useState<StoredMistake | null>(null);
   const [drillCluster, setDrillCluster] = useState<WeaknessCluster | null>(null);
@@ -85,7 +87,7 @@ export default function WeaknessDashboard({
       )}
 
       {/* Top nav */}
-      <TopNav active="weaknesses" username={username} />
+      <TopNav active="weaknesses" username={username} onNavigate={onNavigate} />
 
       {/* Hero banner + metrics */}
       <DashboardHero

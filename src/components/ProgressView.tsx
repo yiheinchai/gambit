@@ -13,6 +13,7 @@ interface Props {
   openingStats?: OpeningStatsType[];
   eloPrediction?: EloPrediction;
   onRefresh?: () => void;
+  onNavigate?: (tab: string) => void;
 }
 
 function formatDate(d: Date): string {
@@ -25,6 +26,7 @@ export default function ProgressView({
   openingStats,
   eloPrediction,
   onRefresh,
+  onNavigate,
 }: Props) {
   const { overallStats, eloHistory, mistakeRateTrend, blunderRateTrend, phaseBreakdown } =
     progress;
@@ -38,7 +40,7 @@ export default function ProgressView({
 
   return (
     <div style={{ fontFamily: "var(--sans)" }}>
-      <TopNav active="progress" username={username} />
+      <TopNav active="progress" username={username} onNavigate={onNavigate} />
 
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginBottom: 18 }}>
         <div>
