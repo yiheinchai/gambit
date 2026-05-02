@@ -102,9 +102,18 @@ export default function DrillSchedule({ clusters, username, onDrill }: Props) {
                 </span>
               </div>
               {item.progress && (
-                <div className="flex items-center gap-3 mt-1 text-xs text-zinc-500">
+                <div className="flex items-center gap-3 mt-1 text-xs text-zinc-500 flex-wrap">
                   <span>{item.progress.totalAttempts} attempts</span>
                   <span>{Math.round(item.progress.successRate * 100)}% accuracy</span>
+                  {item.progress.novelAttempts != null && item.progress.novelAttempts > 0 && (
+                    <span className={
+                      (item.progress.novelCorrect || 0) / item.progress.novelAttempts >= 0.7
+                        ? "text-green-500"
+                        : "text-amber-500"
+                    }>
+                      {Math.round(((item.progress.novelCorrect || 0) / item.progress.novelAttempts) * 100)}% on new positions
+                    </span>
+                  )}
                   {item.status === "upcoming" && (
                     <span>Due {formatRelativeDate(new Date(item.progress.nextDue))}</span>
                   )}

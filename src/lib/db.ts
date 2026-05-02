@@ -53,6 +53,10 @@ export interface DrillProgress {
   lastDrilled: Date;
   nextDue: Date;
   interval: number;
+  // Track positions already drilled to measure novel vs repeated accuracy
+  drilledPositionFens?: string[];
+  novelAttempts?: number;
+  novelCorrect?: number;
 }
 
 export interface CachedExplanation {

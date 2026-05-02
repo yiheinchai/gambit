@@ -104,6 +104,7 @@ function fenToTensor(fen: string): Float32Array {
 }
 
 let session: ort.InferenceSession | null = null;
+let modelVersion: string | null = null;
 
 async function getSession(): Promise<ort.InferenceSession> {
   if (!session) {
@@ -111,8 +112,20 @@ async function getSession(): Promise<ort.InferenceSession> {
     session = await ort.InferenceSession.create("/models/concept_classifier.onnx", {
       executionProviders: ["wasm"],
     });
+    // Load model version from manifest
+    try {
+      const res = await fetch("/models/concepts.json");
+      if (res.ok) {
+        const manifest = await res.json();
+        modelVersion = `${manifest.params}-${manifest.concept_dim}`;
+      }
+    } catch { /* ignore */ }
   }
   return session;
+}
+
+export function getModelVersion(): string | null {
+  return modelVersion;
 }
 
 export async function classifyPosition(fen: string): Promise<ConceptResult> {

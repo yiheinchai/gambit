@@ -143,6 +143,13 @@ export default function DrillMode({ cluster, onClose }: Props) {
       const prevInterval = existing?.interval || 1;
       const { interval, nextDue } = computeNextInterval(prevInterval, stats.accuracy);
 
+      // Track novel vs repeated positions
+      const prevFens = new Set(existing?.drilledPositionFens || []);
+      const sessionFens = attempts.map((a) => a.position.fen);
+      const novelInSession = attempts.filter((a) => !prevFens.has(a.position.fen));
+      const novelCorrectCount = novelInSession.filter((a) => a.isCorrect).length;
+      const allFens = [...prevFens, ...sessionFens];
+
       await saveDrillProgress({
         id: existing?.id,
         clusterId: cluster.id,
@@ -152,9 +159,12 @@ export default function DrillMode({ cluster, onClose }: Props) {
         lastDrilled: new Date(),
         nextDue,
         interval,
+        drilledPositionFens: [...new Set(allFens)],
+        novelAttempts: (existing?.novelAttempts || 0) + novelInSession.length,
+        novelCorrect: (existing?.novelCorrect || 0) + novelCorrectCount,
       });
     })();
-  }, [drillState, cluster.id, stats.total, stats.correct, stats.accuracy]);
+  }, [drillState, cluster.id, stats.total, stats.correct, stats.accuracy, attempts]);
 
   if (drillState === "complete") {
     return (

@@ -77,6 +77,27 @@ export default function WeaknessDashboard({
         <p className="text-zinc-400">{totalGames} games analyzed</p>
       </div>
 
+      {/* Cold start: not enough data for meaningful patterns */}
+      {totalGames > 0 && totalGames < 10 && (
+        <div className="bg-blue-900/20 border border-blue-700/30 rounded-lg p-4 text-center">
+          <p className="text-blue-300 text-sm font-medium mb-1">
+            Limited data ({totalGames} games)
+          </p>
+          <p className="text-zinc-400 text-sm">
+            Weakness patterns become more accurate with 20+ games. The individual mistakes below are still useful — come back after more games for pattern detection.
+          </p>
+        </div>
+      )}
+
+      {mistakes.length === 0 && totalGames > 0 && (
+        <div className="bg-green-900/20 border border-green-700/30 rounded-lg p-4 text-center">
+          <p className="text-green-300 text-sm font-medium">No significant mistakes found</p>
+          <p className="text-zinc-400 text-sm">
+            Try the Deep analysis preset for more thorough detection, or you&apos;re playing very clean chess.
+          </p>
+        </div>
+      )}
+
       {/* Stats row */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <StatCard label="Total Mistakes" value={stats.total} />
