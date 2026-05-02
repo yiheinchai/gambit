@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Gambit — UI</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700;800&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg: #FAF8F2;
+    --bg-2: #F1EDE2;
+    --ink: #1B2730;
+    --ink-2: #4A5A66;
+    --ink-3: #8A98A3;
+    --line: #E5DFD0;
+
+    --green: #58CC02;
+    --green-dark: #45A302;
+    --green-2: #A8D88A;
+
+    --orange: #FF8B3D;
+    --orange-dark: #C25A1B;
+
+    --red: #E04E3F;
+
+    --purple: #8B5CF6;
+
+    --blue: #3B82F6;
+
+    --yellow: #FFD23F;
+    --yellow-dark: #D4A91A;
+
+    --sans: "DM Sans", system-ui, -apple-system, sans-serif;
+    --mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", monospace;
+  }
+  html, body { margin: 0; padding: 0; background: #E8E2D2; font-family: var(--sans); color: var(--ink); }
+  * { box-sizing: border-box; }
+</style>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+</head>
+<body>
+<div id="root"></div>
+
+<script type="text/babel" src="design-canvas.jsx"></script>
+<script type="text/babel" src="screens/landing.jsx"></script>
+<script type="text/babel" src="screens/loading.jsx"></script>
+<script type="text/babel" src="screens/dashboard.jsx"></script>
+<script type="text/babel" src="screens/detail.jsx"></script>
+<script type="text/babel" src="screens/drill.jsx"></script>
+<script type="text/babel" src="screens/progress.jsx"></script>
+
+<script type="text/babel">
+const { DesignCanvas, DCSection, DCArtboard } = window;
+
+function App() {
+  return (
+    <DesignCanvas title="Gambit — chess weakness coach">
+      <DCSection id="entry" title="01 · Entry & analysis">
+        <DCArtboard id="landing" label="Landing" width={1280} height={820}>
+          <window.Landing />
+        </DCArtboard>
+        <DCArtboard id="loading" label="Analysis loading" width={1280} height={820}>
+          <window.LoadingScreen />
+        </DCArtboard>
+      </DCSection>
+
+      <DCSection id="insights" title="02 · Weakness insights">
+        <DCArtboard id="dashboard" label="Weakness dashboard (hero)" width={1280} height={1240}>
+          <window.Dashboard />
+        </DCArtboard>
+        <DCArtboard id="detail" label="Weakness detail · concept diff" width={1280} height={920}>
+          <window.Detail />
+        </DCArtboard>
+      </DCSection>
+
+      <DCSection id="practice" title="03 · Practice & progress">
+        <DCArtboard id="drill" label="Drill mode" width={1280} height={880}>
+          <window.Drill />
+        </DCArtboard>
+        <DCArtboard id="progress" label="Progress tracker" width={1280} height={1080}>
+          <window.Progress />
+        </DCArtboard>
+      </DCSection>
+    </DesignCanvas>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>
+</body>
+</html>
