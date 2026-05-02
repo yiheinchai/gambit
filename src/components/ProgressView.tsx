@@ -4,6 +4,8 @@ import type { OpeningStats as OpeningStatsType } from "@/lib/openings";
 import type { EloPrediction } from "@/lib/elo-prediction";
 import { LineChart, BarChart } from "./Charts";
 import OpeningStats from "./OpeningStats";
+import EloBanner from "./EloBanner";
+import TopNav from "./TopNav";
 
 interface Props {
   progress: ProgressData;
@@ -32,45 +34,43 @@ export default function ProgressView({
       ? eloHistory[eloHistory.length - 1].elo - eloHistory[0].elo
       : 0;
 
+  const currentElo = eloHistory.length > 0 ? eloHistory[eloHistory.length - 1].elo : undefined;
+
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
+    <div style={{ fontFamily: "var(--sans)" }}>
+      <TopNav active="progress" username={username} />
+
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginBottom: 18 }}>
         <div>
-          <h2 className="text-2xl font-bold text-white">{username} — Progress</h2>
-          <p className="text-zinc-500 text-sm">{overallStats.totalGames} games analyzed</p>
+          <div style={{ fontSize: 11, fontWeight: 800, color: "var(--ink-3)", textTransform: "uppercase", letterSpacing: 0.5 }}>
+            Progress · last 90 days
+          </div>
+          <h1 style={{ fontSize: 42, fontWeight: 900, letterSpacing: -1.2, margin: "6px 0 0", lineHeight: 1.05, color: "var(--ink)" }}>
+            You&apos;re getting better.
+          </h1>
         </div>
-        {onRefresh && (
-          <button
-            onClick={onRefresh}
-            className="px-4 py-2 bg-zinc-700 hover:bg-zinc-600 text-zinc-300 text-sm rounded-lg transition-colors"
-          >
-            Add New Games
-          </button>
-        )}
+        <div style={{ display: "flex", gap: 8 }}>
+          {onRefresh && (
+            <button
+              onClick={onRefresh}
+              className="btn-duo"
+              style={{
+                background: "var(--green)", color: "white", padding: "12px 18px",
+                borderRadius: 12, fontSize: 12, letterSpacing: 0.6,
+                boxShadow: "0 4px 0 var(--green-dark)",
+              }}
+            >
+              Pull new games
+            </button>
+          )}
+        </div>
       </div>
 
-      {/* Elo prediction */}
-      {eloPrediction && eloPrediction.potentialGain > 0 && (
-        <div className="bg-gradient-to-r from-amber-900/20 to-zinc-800 border border-amber-700/30 rounded-lg p-4">
-          <div className="flex items-center gap-3 mb-3">
-            <span className="text-2xl font-bold text-amber-400">
-              +{eloPrediction.potentialGain}
-            </span>
-            <span className="text-zinc-400 text-sm">estimated Elo gain potential</span>
-          </div>
-          <div className="space-y-1.5">
-            {eloPrediction.topImprovements.map((imp, i) => (
-              <div key={i} className="flex items-center justify-between text-sm">
-                <span className="text-zinc-400">{imp.label}</span>
-                <span className="text-green-400 font-medium">+{imp.eloGain} Elo</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
+      {/* Elo prediction banner */}
+      <EloBanner currentElo={currentElo} prediction={eloPrediction} />
 
       {/* Summary stats */}
-      <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: 12, marginTop: 18 }}>
         <MiniStat
           label="Win Rate"
           value={`${Math.round(overallStats.winRate * 100)}%`}
