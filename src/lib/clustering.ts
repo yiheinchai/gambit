@@ -231,31 +231,90 @@ export function clusterMistakes(mistakes: StoredMistake[]): WeaknessCluster[] {
   return clusters.sort((a, b) => b.frequency * b.avgCpLoss - a.frequency * a.avgCpLoss);
 }
 
+function classifyMistakeType(m: StoredMistake): string {
+  const cpLoss = m.centipawnLoss;
+
+  // Huge eval swing = likely hung a piece or missed a tactic
+  if (cpLoss >= 500) return "hung_piece";
+  if (cpLoss >= 300) return "tactical_miss";
+
+  // Analyze the FEN to detect patterns
+  const fen = m.fen;
+  const pieces = fen.split(" ")[0];
+  const totalPieces = pieces.replace(/[^a-zA-Z]/g, "").replace(/[kKpP]/g, "").length;
+
+  // Endgame with few pieces
+  if (totalPieces <= 6) return "endgame_technique";
+
+  // Check if it's a pawn structure issue (low cp loss, middlegame)
+  if (cpLoss < 100 && m.gamePhase === "middlegame") return "positional_error";
+
+  // Opening mistakes
+  if (m.gamePhase === "opening") {
+    if (cpLoss >= 200) return "opening_trap";
+    return "opening_inaccuracy";
+  }
+
+  // Medium mistakes in middlegame — likely calculation
+  if (m.gamePhase === "middlegame" && cpLoss >= 100) return "calculation_error";
+
+  return "other";
+}
+
+const MISTAKE_TYPE_LABELS: Record<string, { label: string; desc: string }> = {
+  hung_piece: {
+    label: "Hanging Pieces",
+    desc: "Leaving pieces undefended or missing simple captures. These are large material losses (500+ centipawns) that often come from one-move oversights.",
+  },
+  tactical_miss: {
+    label: "Missed Tactics",
+    desc: "Failing to see tactical opportunities or threats. These 300-500cp swings typically involve forks, pins, skewers, or discovered attacks.",
+  },
+  endgame_technique: {
+    label: "Endgame Technique",
+    desc: "Errors in simplified positions with few pieces. Endgame mistakes often involve king activity, pawn promotion, or piece coordination.",
+  },
+  positional_error: {
+    label: "Positional Inaccuracies",
+    desc: "Subtle strategic mistakes — wrong piece placement, premature trades, or weak pawn structure decisions.",
+  },
+  opening_trap: {
+    label: "Opening Traps",
+    desc: "Falling into opening traps or making serious opening mistakes. Study your opening lines to avoid these recurring blunders.",
+  },
+  opening_inaccuracy: {
+    label: "Opening Inaccuracies",
+    desc: "Minor opening deviations from best play. These add up over time and can give your opponent an early advantage.",
+  },
+  calculation_error: {
+    label: "Calculation Errors",
+    desc: "Middlegame mistakes from miscalculating tactical sequences. Practice visualizing 2-3 moves ahead.",
+  },
+  other: {
+    label: "Other Mistakes",
+    desc: "Miscellaneous errors that don't fit a clear pattern.",
+  },
+};
+
 function clusterByHeuristic(mistakes: StoredMistake[]): WeaknessCluster[] {
   const groups: Record<string, StoredMistake[]> = {};
 
   for (const m of mistakes) {
-    const key = `${m.gamePhase}_${m.severity}`;
-    if (!groups[key]) groups[key] = [];
-    groups[key].push(m);
+    const type = classifyMistakeType(m);
+    if (!groups[type]) groups[type] = [];
+    groups[type].push(m);
   }
 
-  const phaseLabels: Record<string, string> = {
-    opening: "Opening",
-    middlegame: "Middlegame",
-    endgame: "Endgame",
-  };
-
   return Object.entries(groups)
-    .map(([key, groupMistakes], idx) => {
-      const [phase, severity] = key.split("_");
+    .map(([type, groupMistakes], idx) => {
       const avgCpLoss =
         groupMistakes.reduce((sum, m) => sum + m.centipawnLoss, 0) / groupMistakes.length;
+      const info = MISTAKE_TYPE_LABELS[type] || MISTAKE_TYPE_LABELS.other;
 
       return {
         id: idx,
-        label: `${phaseLabels[phase]} ${severity === "blunder" ? "Blunders" : "Mistakes"}`,
-        description: `${groupMistakes.length} ${severity === "blunder" ? "blunders" : "mistakes"} in the ${phase}, averaging ${Math.round(avgCpLoss)} centipawn loss.`,
+        label: info.label,
+        description: `${groupMistakes.length} occurrences, averaging ${Math.round(avgCpLoss)}cp loss. ${info.desc}`,
         topConcepts: [],
         mistakes: groupMistakes,
         frequency: groupMistakes.length,
