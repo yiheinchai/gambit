@@ -2,35 +2,8 @@ import * as ort from "onnxruntime-web";
 import { Chess } from "chess.js";
 import { assetUrl } from "./base-path";
 
-const CONCEPT_NAMES = [
-  "fork_possible",
-  "pin_exists",
-  "skewer_possible",
-  "discovered_attack",
-  "back_rank_threat",
-  "hanging_piece",
-  "overloaded_defender",
-  "trapped_piece",
-  "passed_pawn",
-  "isolated_pawn",
-  "doubled_pawn",
-  "backward_pawn",
-  "open_file_rook",
-  "bishop_pair",
-  "bad_bishop",
-  "knight_outpost",
-  "weak_squares",
-  "space_advantage",
-  "king_exposed",
-  "castled",
-  "pawn_shield_broken",
-  "material_up",
-  "material_down",
-  "material_imbalance",
-  "is_opening",
-  "is_middlegame",
-  "is_endgame",
-];
+let CONCEPT_NAMES: string[] = [];
+let conceptDim = 0;
 
 export { CONCEPT_NAMES };
 
@@ -46,18 +19,8 @@ export interface ConceptDiff {
 }
 
 const PIECE_MAP: Record<string, [number, number]> = {
-  p: [0, 1],
-  n: [1, 1],
-  b: [2, 1],
-  r: [3, 1],
-  q: [4, 1],
-  k: [5, 1],
-  P: [0, 0],
-  N: [1, 0],
-  B: [2, 0],
-  R: [3, 0],
-  Q: [4, 0],
-  K: [5, 0],
+  p: [0, 1], n: [1, 1], b: [2, 1], r: [3, 1], q: [4, 1], k: [5, 1],
+  P: [0, 0], N: [1, 0], B: [2, 0], R: [3, 0], Q: [4, 0], K: [5, 0],
 };
 
 function fenToTensor(fen: string): Float32Array {
@@ -69,23 +32,18 @@ function fenToTensor(fen: string): Float32Array {
     for (let file = 0; file < 8; file++) {
       const piece = board[rank][file];
       if (!piece) continue;
-
       const key = piece.color === "w" ? piece.type.toUpperCase() : piece.type;
       const [pieceIdx, colorOffset] = PIECE_MAP[key];
       const channel = pieceIdx + colorOffset * 6;
-      const r = 7 - rank; // chess.js board is rank 8 at index 0
+      const r = 7 - rank;
       tensor[channel * 64 + r * 8 + file] = 1.0;
     }
   }
 
-  // Channel 12: side to move
   if (chess.turn() === "w") {
-    for (let i = 0; i < 64; i++) {
-      tensor[12 * 64 + i] = 1.0;
-    }
+    for (let i = 0; i < 64; i++) tensor[12 * 64 + i] = 1.0;
   }
 
-  // Channel 13: castling rights
   const fenParts = fen.split(" ");
   const castling = fenParts[2] || "-";
   if (castling.includes("K")) tensor[13 * 64 + 0 * 8 + 7] = 1.0;
@@ -93,7 +51,6 @@ function fenToTensor(fen: string): Float32Array {
   if (castling.includes("k")) tensor[13 * 64 + 7 * 8 + 7] = 1.0;
   if (castling.includes("q")) tensor[13 * 64 + 7 * 8 + 0] = 1.0;
 
-  // Channel 14: en passant
   const ep = fenParts[3] || "-";
   if (ep !== "-") {
     const epFile = ep.charCodeAt(0) - "a".charCodeAt(0);
@@ -113,14 +70,16 @@ async function getSession(): Promise<ort.InferenceSession> {
     session = await ort.InferenceSession.create(assetUrl("models/concept_classifier.onnx"), {
       executionProviders: ["wasm"],
     });
-    // Load model version from manifest
+
     try {
       const res = await fetch(assetUrl("models/concepts.json"));
       if (res.ok) {
         const manifest = await res.json();
-        modelVersion = `${manifest.params}-${manifest.concept_dim}`;
+        CONCEPT_NAMES = manifest.concept_names || [];
+        conceptDim = manifest.concept_dim || CONCEPT_NAMES.length;
+        modelVersion = `${manifest.type || "unknown"}-${conceptDim}`;
       }
-    } catch { /* ignore */ }
+    } catch { /* use defaults */ }
   }
   return session;
 }
@@ -136,10 +95,9 @@ export async function classifyPosition(fen: string): Promise<ConceptResult> {
   const results = await sess.run({ board: inputTensor });
   const activations = results.concepts.data as Float32Array;
 
-  const topConcepts = CONCEPT_NAMES.map((name, i) => ({
-    name,
-    activation: activations[i],
-  }))
+  const topConcepts = Array.from(activations)
+    .map((val, i) => ({ name: CONCEPT_NAMES[i] || `feature_${i}`, activation: val }))
+    .filter((c) => c.activation > 0)
     .sort((a, b) => b.activation - a.activation)
     .slice(0, 5);
 
@@ -151,51 +109,39 @@ export async function computeConceptDiff(
   playedMove: string,
   bestMove: string
 ): Promise<ConceptDiff> {
-  const chess = new Chess(fen);
-
-  // Get concept vector after the played move
-  const chessPlayed = new Chess(fen);
-  try {
-    chessPlayed.move(playedMove);
-  } catch {
+  function tryMove(fromFen: string, move: string): string {
+    const chess = new Chess(fromFen);
     try {
-      const from = playedMove.slice(0, 2);
-      const to = playedMove.slice(2, 4);
-      const promotion = playedMove[4];
-      chessPlayed.move({ from, to, promotion });
+      chess.move(move);
+      return chess.fen();
     } catch {
-      // fallback
+      try {
+        const from = move.slice(0, 2);
+        const to = move.slice(2, 4);
+        const promotion = move[4];
+        chess.move({ from, to, promotion });
+        return chess.fen();
+      } catch {
+        return fromFen;
+      }
     }
   }
-  const afterPlayed = await classifyPosition(chessPlayed.fen());
 
-  // Get concept vector after the best move
-  const chessBest = new Chess(fen);
-  try {
-    chessBest.move(bestMove);
-  } catch {
-    try {
-      const from = bestMove.slice(0, 2);
-      const to = bestMove.slice(2, 4);
-      const promotion = bestMove[4];
-      chessBest.move({ from, to, promotion });
-    } catch {
-      // fallback
-    }
-  }
-  const afterBest = await classifyPosition(chessBest.fen());
+  const afterPlayed = await classifyPosition(tryMove(fen, playedMove));
+  const afterBest = await classifyPosition(tryMove(fen, bestMove));
 
-  // Diff = best - played (positive = concept present in best but missed in played)
-  const diff = new Float32Array(CONCEPT_NAMES.length);
+  const dim = afterBest.activations.length;
+  const diff = new Float32Array(dim);
   const missed: { name: string; delta: number }[] = [];
   const gained: { name: string; delta: number }[] = [];
 
-  for (let i = 0; i < CONCEPT_NAMES.length; i++) {
+  for (let i = 0; i < dim; i++) {
     diff[i] = afterBest.activations[i] - afterPlayed.activations[i];
-    if (diff[i] > 0.3) {
-      missed.push({ name: CONCEPT_NAMES[i], delta: diff[i] });
-    } else if (diff[i] < -0.3) {
-      gained.push({ name: CONCEPT_NAMES[i], delta: -diff[i] });
+    const name = CONCEPT_NAMES[i] || `feature_${i}`;
+    if (diff[i] > 0.1) {
+      missed.push({ name, delta: diff[i] });
+    } else if (diff[i] < -0.1) {
+      gained.push({ name, delta: -diff[i] });
     }
   }
 
@@ -209,10 +155,7 @@ let modelAvailable: boolean | null = null;
 
 export async function isModelAvailable(): Promise<boolean> {
   if (modelAvailable !== null) return modelAvailable;
-  if (typeof window === "undefined") {
-    modelAvailable = false;
-    return false;
-  }
+  if (typeof window === "undefined") { modelAvailable = false; return false; }
   try {
     const res = await fetch(assetUrl("models/concept_classifier.onnx"), { method: "HEAD" });
     modelAvailable = res.ok;
