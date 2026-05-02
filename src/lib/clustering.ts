@@ -351,5 +351,23 @@ function generateClusterDescription(
     mistakes.reduce((sum, m) => sum + m.centipawnLoss, 0) / mistakes.length
   );
 
-  return `Recurring pattern in the ${dominantPhase} involving ${conceptLabels.toLowerCase()}. Found ${mistakes.length} times, averaging ${avgCp}cp loss.`;
+  const blunderCount = mistakes.filter(m => m.severity === "blunder").length;
+  const blunderPct = Math.round((blunderCount / mistakes.length) * 100);
+
+  let advice = "";
+  if (avgCp > 300) {
+    advice = " These are severe — fixing this pattern will have the biggest impact on your rating.";
+  } else if (avgCp > 150) {
+    advice = " Drill these positions until you recognize the pattern instinctively.";
+  } else {
+    advice = " These are subtle but add up over many games.";
+  }
+
+  if (dominantPhase === "endgame") {
+    advice += " Practice endgame technique separately — these positions reward precision.";
+  } else if (dominantPhase === "opening") {
+    advice += " Review your opening preparation in these lines.";
+  }
+
+  return `Found ${mistakes.length} times in the ${dominantPhase} (${blunderPct}% blunders), averaging ${avgCp}cp loss.${advice}`;
 }
