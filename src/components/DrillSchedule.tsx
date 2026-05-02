@@ -68,10 +68,10 @@ export default function DrillSchedule({ clusters, username, onDrill }: Props) {
 
   return (
     <section>
-      <div className="flex items-center justify-between mb-4">
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
         <div>
-          <h3 className="text-xl font-semibold text-white">Drill Schedule</h3>
-          <p className="text-zinc-500 text-sm">
+          <h2 style={{ fontSize: 22, fontWeight: 900, letterSpacing: -0.5, margin: 0, color: "var(--ink)" }}>Drill Schedule</h2>
+          <p style={{ fontSize: 13, color: "var(--ink-3)", fontWeight: 600 }}>
             {dueCount > 0
               ? `${dueCount} drill${dueCount === 1 ? "" : "s"} due today`
               : "All caught up!"}
