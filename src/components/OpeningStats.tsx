@@ -62,6 +62,41 @@ export default function OpeningStats({ stats }: Props) {
         })}
       </div>
 
+      {/* Recommendations */}
+      {(() => {
+        const problems = stats.filter(s => s.gamesPlayed >= 3 && s.winRate < 0.4);
+        const strengths = stats.filter(s => s.gamesPlayed >= 3 && s.winRate >= 0.6);
+        if (problems.length === 0 && strengths.length === 0) return null;
+        return (
+          <div style={{ marginTop: 14, paddingTop: 12, borderTop: "1.5px dashed var(--line)" }}>
+            {problems.length > 0 && (
+              <div style={{ marginBottom: 8 }}>
+                {problems.slice(0, 2).map(o => (
+                  <div key={o.name} style={{ display: "flex", alignItems: "center", gap: 8, padding: "6px 10px", background: "#FFF4E5", border: "1.5px solid var(--orange)", borderRadius: 10, marginBottom: 4, fontSize: 12 }}>
+                    <span style={{ fontWeight: 900, color: "var(--orange-dark)" }}>⚠</span>
+                    <span style={{ color: "var(--ink)", fontWeight: 600 }}>
+                      <b>{o.name}</b>: {Math.round(o.winRate * 100)}% win rate in {o.gamesPlayed} games — consider studying this line
+                    </span>
+                  </div>
+                ))}
+              </div>
+            )}
+            {strengths.length > 0 && (
+              <div>
+                {strengths.slice(0, 2).map(o => (
+                  <div key={o.name} style={{ display: "flex", alignItems: "center", gap: 8, padding: "6px 10px", background: "#E8F8E5", border: "1.5px solid var(--green)", borderRadius: 10, marginBottom: 4, fontSize: 12 }}>
+                    <span style={{ fontWeight: 900, color: "var(--green-dark)" }}>✓</span>
+                    <span style={{ color: "var(--ink)", fontWeight: 600 }}>
+                      <b>{o.name}</b>: {Math.round(o.winRate * 100)}% win rate — keep playing this!
+                    </span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        );
+      })()}
+
       <div style={{ display: "flex", alignItems: "center", gap: 16, marginTop: 14, paddingTop: 12, borderTop: "1.5px dashed var(--line)", fontSize: 11, fontWeight: 700, color: "var(--ink-3)" }}>
         <span style={{ display: "flex", alignItems: "center", gap: 4 }}><span style={{ width: 8, height: 8, borderRadius: 4, background: "var(--green)" }} />Win</span>
         <span style={{ display: "flex", alignItems: "center", gap: 4 }}><span style={{ width: 8, height: 8, borderRadius: 4, background: "var(--bg-2)", border: "1px solid var(--line)" }} />Draw</span>
