@@ -1,0 +1,8 @@
+torch>=2.0
+numpy
+python-chess
+onnx
+onnxruntime
+scikit-learn
+tqdm
+h5py

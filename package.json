@@ -1,0 +1,34 @@
+{
+  "name": "gambit",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint",
+    "test": "npx tsx src/lib/__tests__/stockfish-smoke.test.ts && npx tsx src/lib/__tests__/clustering-smoke.test.ts && npx tsx src/lib/__tests__/progress-smoke.test.ts",
+    "test:e2e": "npx tsx src/lib/__tests__/smoke.test.ts",
+    "postinstall": "mkdir -p public/stockfish && cp node_modules/stockfish/bin/stockfish-18-lite-single.js public/stockfish/ && cp node_modules/stockfish/bin/stockfish-18-lite-single.wasm public/stockfish/stockfish.wasm"
+  },
+  "dependencies": {
+    "chess.js": "^1.4.0",
+    "idb": "^8.0.3",
+    "next": "16.2.4",
+    "onnxruntime-web": "^1.25.1",
+    "react": "19.2.4",
+    "react-chessboard": "^5.10.0",
+    "react-dom": "19.2.4",
+    "stockfish": "^18.0.7"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "eslint": "^9",
+    "eslint-config-next": "16.2.4",
+    "tailwindcss": "^4",
+    "typescript": "^5"
+  }
+}
