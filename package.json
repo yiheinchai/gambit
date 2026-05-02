@@ -9,7 +9,7 @@
     "lint": "eslint",
     "test": "npx tsx src/lib/__tests__/stockfish-smoke.test.ts && npx tsx src/lib/__tests__/clustering-smoke.test.ts && npx tsx src/lib/__tests__/progress-smoke.test.ts",
     "test:e2e": "npx tsx src/lib/__tests__/smoke.test.ts",
-    "postinstall": "mkdir -p public/stockfish public/onnx public/models && cp node_modules/stockfish/bin/stockfish-18-lite-single.js public/stockfish/ && cp node_modules/stockfish/bin/stockfish-18-lite-single.wasm public/stockfish/stockfish.wasm && cp node_modules/onnxruntime-web/dist/ort-wasm-simd-threaded.wasm public/onnx/"
+    "postinstall": "mkdir -p public/stockfish public/onnx public/models && cp node_modules/stockfish/bin/stockfish-18-lite-single.js public/stockfish/ && cp node_modules/stockfish/bin/stockfish-18-lite-single.wasm public/stockfish/stockfish-18-lite-single.wasm && cp node_modules/onnxruntime-web/dist/ort-wasm-simd-threaded.wasm public/onnx/"
   },
   "dependencies": {
     "@tanstack/react-router": "^1.169.1",
