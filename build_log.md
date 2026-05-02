@@ -1,139 +1,104 @@
 # Gambit Build Log
 
 ## Current State
-**Phase**: Production-ready. All features built, polished, tested.
-**Last updated**: 2026-05-02 iteration 16
-**Build status**: TypeScript clean. 26/26 tests pass. Production build passes.
-**Codebase**: 28 TS files (4114 lines) + 7 Python files (1082 lines) + 11 components + 9 lib modules
-**Repo**: https://github.com/yiheinchai/gambit (12 commits)
+**Phase**: Complete. Every PRD feature implemented, tested, pushed.
+**Last updated**: 2026-05-02 iteration 20
+**Build**: TypeScript clean, 26/26 tests pass, production build passes
+**Codebase**: 34 TS files (5,175 lines) + 8 Python files (1,082 lines)
+**Repo**: https://github.com/yiheinchai/gambit (23 commits)
 
-## All Milestones Complete
+---
 
-### M1: Data Pipeline & Core UI
-- [x] Chess.com API client with snake_case mapping, newest-first ordering
-- [x] PGN parser via chess.js loadPgn(), short game filtering
-- [x] IndexedDB v2 (games, mistakes, clusters, drillProgress, explanationCache)
-- [x] Stockfish 18 WASM (lite-single, 7MB, depth 16)
-- [x] Incremental analysis: cached results loaded, only new games analyzed
-- [x] Cancel/stop mid-analysis with partial results viewing
-- [x] ETA display during analysis
-- [x] Error handling: player not found, network errors, empty profiles
+## Feature Inventory (All PRD Items)
 
-### M2: Concept Probe Training
-- [x] Full training pipeline: board_encoder, concept_labels, concept_model
-- [x] Synthetic data generator (no Lichess download needed for testing)
-- [x] Pipeline E2E test: generate → train → export → validate
-- [x] Trained: 1.8M params, 128ch, 6 blocks, 20 epochs, 90.7% accuracy
-- [x] Exported: 7MB ONNX + concepts.json manifest
-- [x] Browser export script with ONNX validation
+| PRD Feature | Status | Files |
+|---|---|---|
+| Chess.com game import | Done | `chesscom-api.ts` |
+| Stockfish WASM analysis | Done | `stockfish.ts`, `analysis.ts` |
+| Concept model (ONNX) | Done | `concept-classifier.ts`, `concept_model.py` |
+| Weakness clustering | Done | `clustering.ts` |
+| Interactive drills | Done | `drill-engine.ts`, `DrillMode.tsx` |
+| Matched puzzles | Done | `puzzles.ts`, `PuzzleMode.tsx` |
+| Spaced repetition (SM-2) | Done | `drill-engine.ts`, `DrillSchedule.tsx` |
+| Progress tracking | Done | `progress.ts`, `ProgressView.tsx`, `Charts.tsx` |
+| Opening repertoire | Done | `openings.ts`, `OpeningStats.tsx` |
+| Concept radar chart | Done | `ConceptRadar.tsx` |
+| LLM explanations | Done | `api/explain/route.ts`, `explanations.ts` |
+| Explanation caching | Done | `db.ts` (IndexedDB, 7-day TTL) |
+| Elo prediction | Done | `elo-prediction.ts` |
+| JSON export | Done | `export.ts` |
+| Analysis depth presets | Done | `UsernameForm.tsx` (Quick/Standard/Deep) |
+| Cancel/partial results | Done | `page.tsx` |
+| ETA display | Done | `AnalysisProgress.tsx` |
+| Incremental analysis | Done | `page.tsx` (skips cached games) |
+| Returning user auto-load | Done | `page.tsx` (localStorage + IndexedDB) |
+| "Add New Games" button | Done | `ProgressView.tsx` |
+| Drill keyboard shortcuts | Done | `DrillMode.tsx`, `PuzzleMode.tsx` |
+| Mobile CPU warning | Done | `AnalysisProgress.tsx` |
+| Diagnostics page | Done | `debug/page.tsx` (8 tests including ONNX) |
+| Mobile responsive | Done | All components |
 
-### M3: Concept Analysis in Browser
-- [x] ONNX Runtime Web inference (auto-detects model availability)
-- [x] Concept diff computation: what the player missed per mistake
-- [x] k-means clustering with cosine similarity + auto-K via silhouette
-- [x] Heuristic fallback when no model present
-- [x] Concept radar chart (SVG spider chart of weakness profile)
-- [x] GameReview shows "What you missed" concept tags
+## Concept Model
 
-### M4: Explanations
-- [x] /api/explain: Claude Haiku coaching explanations with fallback
-- [x] Explanation caching in IndexedDB (7-day TTL)
-- [x] Cluster cards load explanations asynchronously
-
-### M5: Drill Engine
-- [x] Interactive drill with drag-and-drop + Stockfish evaluation
-- [x] Spaced repetition scheduling (SM-2 algorithm)
-- [x] Drill progress persistence across sessions in IndexedDB
-- [x] Drill schedule UI: Due/New/Scheduled/Mastered status badges
-- [x] Schedule auto-refreshes after drill completion
-- [x] Completion screen with accuracy stats
-
-### M6: Progress Tracking
-- [x] Elo over time, mistakes/game trend, blunders/game trend
-- [x] Phase breakdown, recent results grid, summary stats
-- [x] SVG charts (zero dependencies)
-- [x] Tab navigation: Weaknesses | Progress
-
-### Testing
-- [x] 26/26 unit tests: API smoke, Stockfish logic, clustering, progress
-- [x] Training pipeline E2E test
-- [x] Endpoint smoke tests: /debug, /api/explain, ONNX model, concepts manifest
-- [x] /debug page for in-browser runtime testing
-
-### Deploy Prep
-- [x] GitHub: https://github.com/yiheinchai/gambit
-- [x] vercel.json with COOP/COEP headers
-- [x] ONNX model committed (7MB) for Vercel
-- [x] postinstall copies Stockfish + ONNX WASM from npm
-- [x] .env.example, README with full docs
-
-### Iteration 14
-- [x] Analysis depth presets: Quick Scan (d10/20g), Standard (d14/50g), Deep (d18/100g)
-- [x] Drill keyboard shortcuts: Enter/Space (next), R (retry), Esc (exit)
-
-### Iteration 15
-- [x] Opening repertoire analysis: 30+ openings detected, per-opening W/D/L stats
-- [x] Opening stats in Progress tab with stacked bars and mistake rate flags
-
-### Iteration 16
-- [x] Returning-user auto-load: localStorage saves last username, "Continue as X" link
-- [x] Final concept model: 50K real Lichess positions, 30 epochs, **96.9% accuracy** (val loss 0.084)
-- [x] All endpoints verified, 26/26 tests pass, production build clean
+- Architecture: ResNet CNN, 1.8M params (128ch, 6 residual blocks)
+- Trained on: 50K real Lichess positions (Jan 2013 rated games database)
+- Accuracy: 96.9% average across 27 concepts (val loss 0.084)
+- Output: 7MB ONNX, runs in browser via ONNX Runtime Web (~5ms per position)
+- 27 concepts: fork, pin, skewer, discovered attack, back rank, hanging piece, overloaded defender, trapped piece, passed pawn, isolated pawn, doubled pawn, backward pawn, open file rook, bishop pair, bad bishop, knight outpost, weak squares, space, king safety, castling, pawn shield, material up/down, imbalance, opening, middlegame, endgame
 
 ## To Deploy
 1. Go to https://vercel.com/new
 2. Import: yiheinchai/gambit
 3. Framework: Next.js (auto-detected)
-4. Optional env: ANTHROPIC_API_KEY for LLM explanations
-5. Deploy
+4. Optional env: `ANTHROPIC_API_KEY` for LLM coaching explanations
+5. Deploy — postinstall copies Stockfish + ONNX WASM from npm
 
-## File Structure (30 TS + 8 Python)
+## File Map
 ```
-src/
-  app/
-    layout.tsx, page.tsx
-    api/explain/route.ts
-    debug/page.tsx
-  components/
-    UsernameForm.tsx           — landing page
-    AnalysisProgress.tsx       — progress bars + ETA
-    MistakeCard.tsx            — individual mistake display
-    WeaknessClusterCard.tsx    — cluster card + LLM explanation
-    WeaknessDashboard.tsx      — stats + radar + clusters + schedule
-    GameReview.tsx             — detailed review + concept tags
-    DrillMode.tsx              — interactive drill + persistence
-    DrillSchedule.tsx          — spaced repetition schedule UI
-    ProgressView.tsx           — progress charts
-    Charts.tsx                 — SVG line + bar charts
-    ConceptRadar.tsx           — weakness profile radar chart
-  lib/
-    chesscom-api.ts            — Chess.com API + PGN parsing
-    db.ts                      — IndexedDB v2 + all CRUD
-    stockfish.ts               — Stockfish WASM wrapper
-    analysis.ts                — pipeline + concept integration
-    concept-classifier.ts      — ONNX browser inference
-    clustering.ts              — k-means weakness clustering
-    drill-engine.ts            — drill sessions + SM-2
-    progress.ts                — progress computation
-    explanations.ts            — fetch + cache explanations
-  lib/__tests__/
-    smoke.test.ts              — Chess.com API E2E
-    stockfish-smoke.test.ts    — engine logic tests
-    clustering-smoke.test.ts   — clustering tests
-    progress-smoke.test.ts     — progress tests
-training/
-  scripts/
-    board_encoder.py           — FEN → tensor
-    concept_labels.py          — 27 concept detectors
-    concept_model.py           — ResNet CNN + ONNX export
-    generate_dataset.py        — Lichess PGN → HDF5
-    generate_synthetic.py      — synthetic data for testing
-    train.py                   — training loop
-    export_for_browser.py      — checkpoint → ONNX
-    test_pipeline.py           — E2E pipeline test
-public/
-  models/concept_classifier.onnx (7MB)
-  models/concepts.json
-  stockfish/ (WASM, from postinstall)
-  onnx/ (WASM, from postinstall)
+src/app/
+  page.tsx                      — main page, state machine, incremental analysis
+  layout.tsx                    — root layout, dark theme
+  api/explain/route.ts          — Claude Haiku coaching explanations
+  debug/page.tsx                — 8-test browser diagnostics
+
+src/components/ (13)
+  UsernameForm.tsx              — landing page with depth presets
+  AnalysisProgress.tsx          — progress bars, ETA, mobile warning
+  MistakeCard.tsx               — mistake display with mini board
+  WeaknessClusterCard.tsx       — cluster card + LLM explanation + 3 actions
+  WeaknessDashboard.tsx         — stats + radar + clusters + schedule + export
+  GameReview.tsx                — detailed review + concept tags
+  DrillMode.tsx                 — interactive drill + keyboard shortcuts
+  DrillSchedule.tsx             — spaced repetition schedule UI
+  PuzzleMode.tsx                — matched puzzle practice
+  ProgressView.tsx              — charts + Elo prediction + Add New Games
+  Charts.tsx                    — SVG line + bar charts
+  ConceptRadar.tsx              — weakness profile radar chart
+  OpeningStats.tsx              — opening repertoire analysis
+
+src/lib/ (11)
+  chesscom-api.ts               — Chess.com API + PGN parsing
+  db.ts                         — IndexedDB v2 (6 stores)
+  stockfish.ts                  — Stockfish WASM wrapper
+  analysis.ts                   — pipeline + concept integration
+  concept-classifier.ts         — ONNX browser inference
+  clustering.ts                 — k-means + auto-K
+  drill-engine.ts               — drill sessions + SM-2
+  progress.ts                   — progress computation
+  openings.ts                   — opening detection (30+ openings)
+  elo-prediction.ts             — Elo gain estimation
+  explanations.ts               — fetch + cache LLM explanations
+  export.ts                     — JSON export
+  puzzles.ts                    — Lichess puzzle matching
+
+src/lib/__tests__/ (4)
+  smoke.test.ts                 — Chess.com API E2E
+  stockfish-smoke.test.ts       — engine logic (12 tests)
+  clustering-smoke.test.ts      — clustering (7 tests)
+  progress-smoke.test.ts        — progress (7 tests)
+
+training/scripts/ (8)
+  board_encoder.py, concept_labels.py, concept_model.py
+  generate_dataset.py, generate_synthetic.py
+  train.py, export_for_browser.py, test_pipeline.py
 ```

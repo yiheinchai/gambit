@@ -28,6 +28,8 @@ export default function DebugPage() {
       { name: "Chess.com API fetch", status: "pending", detail: "" },
       { name: "PGN parsing", status: "pending", detail: "" },
       { name: "IndexedDB access", status: "pending", detail: "" },
+      { name: "ONNX concept model", status: "pending", detail: "" },
+      { name: "Concept diff pipeline", status: "pending", detail: "" },
     ];
     setResults(tests);
 
@@ -148,6 +150,47 @@ export default function DebugPage() {
       update("IndexedDB access", { status: "fail", detail: err instanceof Error ? err.message : String(err) });
     }
 
+    // Test 7: ONNX concept model
+    update("ONNX concept model", { status: "running" });
+    try {
+      const t5 = performance.now();
+      const { isModelAvailable, classifyPosition } = await import("@/lib/concept-classifier");
+      const available = await isModelAvailable();
+      if (!available) throw new Error("Model not found at /models/concept_classifier.onnx");
+
+      const result = await classifyPosition("rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq - 0 1");
+      const topConcept = result.topConcepts[0];
+      const dur5 = Math.round(performance.now() - t5);
+      update("ONNX concept model", {
+        status: "pass",
+        detail: `Top concept: ${topConcept.name} (${(topConcept.activation * 100).toFixed(0)}%), ${result.activations.length} dims (${dur5}ms)`,
+        duration: dur5,
+      });
+    } catch (err) {
+      update("ONNX concept model", { status: "fail", detail: err instanceof Error ? err.message : String(err) });
+    }
+
+    // Test 8: Concept diff pipeline
+    update("Concept diff pipeline", { status: "running" });
+    try {
+      const t6 = performance.now();
+      const { computeConceptDiff } = await import("@/lib/concept-classifier");
+      const diff = await computeConceptDiff(
+        "rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq - 0 1",
+        "e5",
+        "c5"
+      );
+      const dur6 = Math.round(performance.now() - t6);
+      const missedNames = diff.missed.map((m) => m.name).join(", ") || "none";
+      update("Concept diff pipeline", {
+        status: "pass",
+        detail: `Missed: [${missedNames}], ${diff.diff.length} dims (${dur6}ms)`,
+        duration: dur6,
+      });
+    } catch (err) {
+      update("Concept diff pipeline", { status: "fail", detail: err instanceof Error ? err.message : String(err) });
+    }
+
     setRunning(false);
   }
 
@@ -158,7 +201,7 @@ export default function DebugPage() {
     <div className="min-h-screen bg-zinc-900 text-white p-8 max-w-2xl mx-auto">
       <h1 className="text-2xl font-bold mb-2">Gambit — Diagnostics</h1>
       <p className="text-zinc-500 text-sm mb-6">
-        Tests Stockfish WASM, Chess.com API, PGN parsing, and IndexedDB in this browser.
+        Tests the full stack: Stockfish WASM, Chess.com API, PGN parsing, IndexedDB, ONNX concept model, and concept diff pipeline.
       </p>
 
       <button
