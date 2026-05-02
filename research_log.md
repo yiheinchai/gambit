@@ -96,12 +96,51 @@ Observations so far:
 - Early stopping threshold not hit yet
 
 ### Results
-*(will complete when training finishes — running SAE pipeline next)*
+
+**Move predictor**: 18.9% top-1, 35.8% top-3 in 33.8 min
+- Surpassed CNN (18.5%) with fewer params (1.4M vs 2.4M)
+- Best at epoch 28, gentle plateau after epoch 20
+
+**SAE** (100 epochs): 439/512 alive, 277 auto-named, 162 unnamed
+- Recon loss: 0.633 (similar to CNN 0.569)
+- 319 features alive at >1% activation (vs CNN's 403)
+- But 277 auto-named (vs 206) = better interpretability
+
+**ONNX**: 3.7MB (down from CNN's 7.1MB)
+
+**Comparison: Transformer vs CNN SAE features**
+
+| Metric | CNN | Transformer |
+|--------|-----|-------------|
+| Move accuracy | 18.5% | 18.9% |
+| Move top-3 | 35.2% | 35.8% |
+| Params | 2.4M | 1.4M |
+| SAE alive | 464 | 439 |
+| Auto-named | 206 | 277 |
+| ONNX size | 7.1MB | 3.7MB |
+
+The transformer produces more interpretable features with a smaller model. The attention mechanism likely captures piece-to-piece relationships that the CNN can't represent.
 
 ### Design Implementation
-- Landing page: pixel-accurate implementation of missedtake design (DONE)
-- Dashboard hero banner: green gradient with Elo prediction (DONE)
-- Dashboard weakness cards: in progress (reading design spec)
+- Landing page: pixel-accurate missedtake design (DONE, deployed)
+- Loading screen: 4-step pipeline stepper with live log (DONE, deployed)
+- Dashboard hero: green gradient banner with Elo prediction (DONE, deployed)
+- Dashboard weakness cards: Duo-style 5-column grid (DONE, deployed)
+- TopNav: green pill tabs (DONE, deployed)
+- Drill UI: HeartsCard, XpCard, DrillFeedback, ConceptTracker (DONE)
+- Drill completion: Duo-style modal (DONE, deployed)
+- EloBanner: dark gradient progress prediction (DONE)
+
+---
+
+## Experiment 3: Planned
+
+### Ideas Queue (ranked by expected impact)
+1. **Increase data**: 500K-1M positions from larger Lichess database
+2. **Multi-task**: predict move + eval + game outcome simultaneously
+3. **Contrastive**: train on (mistake, correct) position pairs specifically
+4. **Deeper transformer**: 6 layers instead of 4
+5. **Validate on pinksockerino**: run the validation script on real user games
 
 ---
 
