@@ -6,12 +6,16 @@ import { LineChart, BarChart } from "./Charts";
 import OpeningStats from "./OpeningStats";
 import EloBanner from "./EloBanner";
 import TopNav from "./TopNav";
+import ClusterProgressGrid from "./ClusterProgressGrid";
+import { clusterMistakes } from "@/lib/clustering";
+import type { StoredMistake } from "@/lib/db";
 
 interface Props {
   progress: ProgressData;
   username: string;
   openingStats?: OpeningStatsType[];
   eloPrediction?: EloPrediction;
+  mistakes?: StoredMistake[];
   onRefresh?: () => void;
   onNavigate?: (tab: string) => void;
 }
@@ -25,9 +29,11 @@ export default function ProgressView({
   username,
   openingStats,
   eloPrediction,
+  mistakes = [],
   onRefresh,
   onNavigate,
 }: Props) {
+  const clusters = mistakes.length > 0 ? clusterMistakes(mistakes) : [];
   const { overallStats, eloHistory, mistakeRateTrend, blunderRateTrend, phaseBreakdown } =
     progress;
 
@@ -136,6 +142,11 @@ export default function ProgressView({
           ]}
         />
       </div>
+
+      {/* Per-cluster progress */}
+      {clusters.length > 0 && (
+        <ClusterProgressGrid clusters={clusters} username={username} />
+      )}
 
       {/* Opening stats */}
       {openingStats && openingStats.length > 0 && (

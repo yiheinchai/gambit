@@ -240,6 +240,7 @@ export default function Home() {
               username={username}
               openingStats={openingStats}
               eloPrediction={eloPrediction || undefined}
+              mistakes={mistakes}
               onRefresh={() => handleAnalyze({ username, depth: 14, gameCount: 50 })}
               onNavigate={(t) => setTab(t as Tab)}
             />
