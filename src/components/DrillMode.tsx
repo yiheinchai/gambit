@@ -109,6 +109,27 @@ export default function DrillMode({ cluster, onClose }: Props) {
 
   const stats = getSessionStats({ ...session, attempts, currentIndex: positionIndex });
 
+  // Keyboard shortcuts
+  useEffect(() => {
+    function onKey(e: KeyboardEvent) {
+      if (drillState === "correct" || drillState === "incorrect") {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          handleNext();
+        }
+        if (e.key === "r" && drillState === "incorrect") {
+          e.preventDefault();
+          handleRetry();
+        }
+      }
+      if (e.key === "Escape") {
+        onClose();
+      }
+    }
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [drillState, handleNext, handleRetry, onClose]);
+
   // Persist drill progress on completion
   useEffect(() => {
     if (drillState !== "complete") return;
@@ -239,25 +260,29 @@ export default function DrillMode({ cluster, onClose }: Props) {
               </div>
 
               {/* Action buttons */}
-              <div className="flex justify-center gap-3 mt-4">
+              <div className="flex flex-col items-center gap-2 mt-4">
                 {(drillState === "correct" || drillState === "incorrect") && (
                   <>
-                    {drillState === "incorrect" && (
+                    <div className="flex gap-3">
+                      {drillState === "incorrect" && (
+                        <button
+                          onClick={handleRetry}
+                          className="px-4 py-2 bg-zinc-700 hover:bg-zinc-600 text-zinc-300 text-sm rounded-lg transition-colors"
+                        >
+                          Retry <kbd className="ml-1 text-xs text-zinc-500">R</kbd>
+                        </button>
+                      )}
                       <button
-                        onClick={handleRetry}
-                        className="px-4 py-2 bg-zinc-700 hover:bg-zinc-600 text-zinc-300 text-sm rounded-lg transition-colors"
+                        onClick={handleNext}
+                        className="px-4 py-2 bg-amber-600 hover:bg-amber-500 text-white text-sm font-medium rounded-lg transition-colors"
                       >
-                        Retry
+                        {positionIndex + 1 >= session.positions.length
+                          ? "Finish"
+                          : "Next"}{" "}
+                        <kbd className="ml-1 text-xs text-amber-300/60">Enter</kbd>
                       </button>
-                    )}
-                    <button
-                      onClick={handleNext}
-                      className="px-4 py-2 bg-amber-600 hover:bg-amber-500 text-white text-sm font-medium rounded-lg transition-colors"
-                    >
-                      {positionIndex + 1 >= session.positions.length
-                        ? "Finish"
-                        : "Next Position"}
-                    </button>
+                    </div>
+                    <p className="text-zinc-600 text-xs">Esc to exit</p>
                   </>
                 )}
               </div>
