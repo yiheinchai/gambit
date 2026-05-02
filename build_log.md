@@ -15,9 +15,13 @@
 - [x] Analysis pipeline with incremental analysis (skips already-analyzed games)
 - [x] Error handling: player not found, network errors, empty profiles, short games
 
-### M2: Concept Probe Training Pipeline (offline, needs GPU)
+### M2: Concept Probe Training Pipeline (COMPLETE)
 - [x] board_encoder.py, concept_labels.py, concept_model.py
-- [x] generate_dataset.py, train.py
+- [x] generate_dataset.py, generate_synthetic.py, train.py
+- [x] export_for_browser.py, test_pipeline.py
+- [x] Trained: 1.8M params, 128ch, 6 blocks, 20 epochs on 10K positions
+- [x] Results: 90.7% avg accuracy, val loss 0.21
+- [x] Exported: 7MB ONNX in public/models/ + concepts.json manifest
 
 ### M3: Concept Analysis in Browser
 - [x] concept-classifier.ts — ONNX Runtime Web inference (ready for trained model)
@@ -69,8 +73,11 @@
 - [x] 6 commits: 04eea46 → e4125d6 → b3e7cae → 1f1cc83 → ee689c5 → 54dde14
 
 ## Remaining
-- [ ] Push to GitHub + deploy to Vercel
-- [ ] M2: Train on real Lichess data with full-size model (needs GPU)
+- [x] Pushed to GitHub: https://github.com/yiheinchai/gambit
+- [x] Concept model trained and wired into analysis pipeline
+- [x] GameReview shows concept tags ("What you missed")
+- [ ] Deploy to Vercel (repo is ready, just needs `vercel deploy`)
+- [ ] Re-train on real Lichess data for production accuracy
 - [ ] Manual browser test via /debug page
 
 ## File Structure (21 TS, 5 Python)
