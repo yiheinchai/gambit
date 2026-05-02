@@ -60,9 +60,11 @@
 - [x] Mobile responsive: all components stack on small screens
 - [x] /debug page: in-browser test suite (Stockfish WASM, API, PGN, IndexedDB)
 - [x] ONNX WASM + models directories ready for concept model
-- [x] Second commit (e4125d6): diagnostics, mobile, ONNX setup
+- [x] Training pipeline E2E: generate → train → export → ONNX validate (ALL PASS)
+- [x] 27 concepts matched between Python and TypeScript
+- [x] Commits: 04eea46 → e4125d6 → b3e7cae → 1f1cc83
 - [ ] Deploy to Vercel
-- [ ] M2: Train concept model on Lichess PGN (needs GPU time)
+- [ ] M2: Train on real Lichess data with full-size model (needs GPU)
 - [ ] Manual browser test via /debug page
 
 ## File Structure (21 TS, 5 Python)
