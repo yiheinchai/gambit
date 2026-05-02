@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Chessboard } from "react-chessboard";
 import { Chess } from "chess.js";
 import type { StoredGame, StoredMistake } from "@/lib/db";
@@ -20,6 +20,21 @@ export default function GameReviewScreen({ game, mistakes, onClose, onDrillMista
     const idx = (m.moveNumber - 1) * 2 + (game.playerColor === "black" ? 1 : 0);
     return Math.abs(idx - moveIdx) <= 1;
   });
+
+  const goNext = useCallback(() => setMoveIdx(i => Math.min(game.fens.length - 1, i + 1)), [game.fens.length]);
+  const goPrev = useCallback(() => setMoveIdx(i => Math.max(0, i - 1)), []);
+
+  useEffect(() => {
+    function onKey(e: KeyboardEvent) {
+      if (e.key === "ArrowRight" || e.key === "l") goNext();
+      if (e.key === "ArrowLeft" || e.key === "h") goPrev();
+      if (e.key === "Home") setMoveIdx(0);
+      if (e.key === "End") setMoveIdx(game.fens.length - 1);
+      if (e.key === "Escape") onClose();
+    }
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [goNext, goPrev, game.fens.length, onClose]);
 
   return (
     <div style={{ position: "fixed", inset: 0, background: "var(--bg)", zIndex: 50, overflow: "auto", fontFamily: "var(--sans)" }}>
