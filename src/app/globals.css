@@ -1,7 +1,59 @@
 @import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800;0,9..40,900;1,9..40,400&family=JetBrains+Mono:wght@400;500;700;800&display=swap');
+
+:root {
+  --bg: #FAF8F2;
+  --bg-2: #F1EDE2;
+  --ink: #1B2730;
+  --ink-2: #4A5A66;
+  --ink-3: #8A98A3;
+  --line: #E5DFD0;
+
+  --green: #58CC02;
+  --green-dark: #45A302;
+  --green-2: #A8D88A;
+
+  --orange: #FF8B3D;
+  --orange-dark: #C25A1B;
+
+  --red: #E04E3F;
+  --purple: #8B5CF6;
+  --blue: #3B82F6;
+  --yellow: #FFD23F;
+  --yellow-dark: #D4A91A;
+
+  --board-dark: #7FA650;
+  --board-light: #EFEFD0;
+
+  --sans: 'DM Sans', system-ui, sans-serif;
+  --mono: 'JetBrains Mono', monospace;
+}
 
 body {
-  background: #0a0a0a;
-  color: #ededed;
-  font-family: system-ui, -apple-system, sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--sans);
+}
+
+.font-mono {
+  font-family: var(--mono);
+}
+
+/* Duo-style button */
+.btn-duo {
+  border: none;
+  font-family: var(--sans);
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  cursor: pointer;
+  transition: transform 80ms, box-shadow 80ms;
+}
+
+.btn-duo:hover {
+  transform: translateY(2px);
+}
+
+.btn-duo:active {
+  transform: translateY(4px);
 }

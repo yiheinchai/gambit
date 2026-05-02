@@ -1,6 +1,7 @@
 
 import { useState, useCallback, useRef, useEffect } from "react";
-import UsernameForm, { type AnalysisConfig } from "@/components/UsernameForm";
+import { type AnalysisConfig } from "@/components/UsernameForm";
+import LandingPage from "@/components/LandingPage";
 import AnalysisProgressComponent from "@/components/AnalysisProgress";
 import WeaknessDashboard from "@/components/WeaknessDashboard";
 import ProgressView from "@/components/ProgressView";
@@ -198,19 +199,11 @@ export default function Home() {
       )}
 
       {state === "idle" && (
-        <div className="flex-1 flex items-center justify-center w-full">
-          <div className="flex flex-col items-center gap-4">
-            <UsernameForm onSubmit={handleAnalyze} loading={false} />
-            {lastUser && (
-              <button
-                onClick={() => loadCachedUser(lastUser)}
-                className="text-zinc-500 hover:text-amber-400 text-sm transition-colors"
-              >
-                Continue as <span className="font-medium text-zinc-300">{lastUser}</span>
-              </button>
-            )}
-          </div>
-        </div>
+        <LandingPage
+          onSubmit={handleAnalyze}
+          lastUser={lastUser}
+          onLoadCached={loadCachedUser}
+        />
       )}
 
       {state === "loading" && (
