@@ -12,6 +12,7 @@ import {
   type DrillAttempt,
 } from "@/lib/drill-engine";
 import { saveDrillProgress, getDrillProgressByCluster } from "@/lib/db";
+import { recordDrillCompletion } from "@/lib/streak";
 
 interface Props {
   cluster: WeaknessCluster;
@@ -129,9 +130,10 @@ export default function DrillMode({ cluster, onClose }: Props) {
     return () => window.removeEventListener("keydown", onKey);
   }, [drillState, handleNext, handleRetry, onClose]);
 
-  // Persist drill progress on completion
+  // Persist drill progress + streak on completion
   useEffect(() => {
     if (drillState !== "complete") return;
+    recordDrillCompletion();
     (async () => {
       const existing = await getDrillProgressByCluster(cluster.id);
       const prevAttempts = existing?.totalAttempts || 0;

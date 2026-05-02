@@ -1,5 +1,6 @@
 import type { EloPrediction } from "@/lib/elo-prediction";
 import type { WeaknessCluster } from "@/lib/clustering";
+import { getStreak } from "@/lib/streak";
 
 interface Props {
   username: string;
@@ -19,7 +20,7 @@ export default function DashboardHero({
   onDrillTop,
 }: Props) {
   const potentialGain = eloPrediction?.potentialGain || 0;
-  const clusterCount = 0; // will be passed in later
+  const streak = getStreak();
 
   return (
     <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: 24, marginBottom: 24 }}>
@@ -32,7 +33,7 @@ export default function DashboardHero({
       }}>
         <div style={{ position: "absolute", right: -20, top: -20, opacity: 0.12, fontSize: 200, lineHeight: 1 }}>♞</div>
         <div style={{ fontSize: 12, fontWeight: 800, letterSpacing: 1, textTransform: "uppercase", opacity: 0.85 }}>
-          {username} · {totalGames} games analyzed
+          {streak.currentStreak > 0 ? `🔥 ${streak.currentStreak}-day streak · ` : ""}{username} · {totalGames} games
         </div>
         <h1 style={{ fontSize: 34, fontWeight: 900, letterSpacing: -1, margin: "10px 0 4px", lineHeight: 1.1 }}>
           {potentialGain > 0 ? (
@@ -65,13 +66,19 @@ export default function DashboardHero({
       </div>
 
       {/* Metric strip */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 12 }}>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: 12 }}>
         <MetricCard label="Games" value={totalGames.toString()} />
         <MetricCard label="Mistakes" value={totalMistakes.toString()} sub={`${(totalMistakes / Math.max(totalGames, 1)).toFixed(1)} / game`} />
         <MetricCard label="Blunders" value={String(0)} color="var(--red)" />
         {potentialGain > 0 && (
           <MetricCard label="Elo potential" value={`+${potentialGain}`} color="var(--green)" />
         )}
+        <MetricCard
+          label="Drill streak"
+          value={streak.currentStreak > 0 ? `🔥 ${streak.currentStreak}` : "0"}
+          sub={streak.isDueToday ? "drill today!" : "keep going"}
+          highlight={streak.currentStreak >= 3}
+        />
       </div>
     </div>
   );
