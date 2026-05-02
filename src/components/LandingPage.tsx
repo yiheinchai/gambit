@@ -1,5 +1,6 @@
 import { useState } from "react";
 import type { AnalysisConfig } from "./UsernameForm";
+import { getStreak } from "@/lib/streak";
 
 interface Props {
   onSubmit: (config: AnalysisConfig) => void;
@@ -112,20 +113,36 @@ export default function LandingPage({ onSubmit, lastUser, onLoadCached }: Props)
           </div>
 
           {/* Continue as */}
-          {lastUser && onLoadCached && (
-            <button
-              onClick={() => onLoadCached(lastUser)}
-              style={{
-                marginTop: 16, padding: "10px 18px", borderRadius: 12,
-                border: "2px solid var(--line)", background: "white",
-                fontSize: 14, fontWeight: 600, color: "var(--ink-2)",
-                cursor: "pointer", fontFamily: "var(--sans)",
-                boxShadow: "0 3px 0 var(--line)",
-              }}
-            >
-              Continue as <span style={{ color: "var(--ink)", fontWeight: 800 }}>{lastUser}</span>
-            </button>
-          )}
+          {lastUser && onLoadCached && (() => {
+            const streak = getStreak();
+            return (
+              <button
+                onClick={() => onLoadCached(lastUser)}
+                style={{
+                  marginTop: 16, padding: "12px 20px", borderRadius: 14,
+                  border: "3px solid var(--ink)", background: "white",
+                  fontSize: 14, fontWeight: 700, color: "var(--ink-2)",
+                  cursor: "pointer", fontFamily: "var(--sans)",
+                  boxShadow: "0 4px 0 var(--ink)",
+                  display: "flex", alignItems: "center", gap: 12,
+                  transition: "transform 80ms, box-shadow 80ms",
+                }}
+                onMouseEnter={e => { (e.currentTarget as HTMLElement).style.transform = "translateY(2px)"; (e.currentTarget as HTMLElement).style.boxShadow = "0 2px 0 var(--ink)"; }}
+                onMouseLeave={e => { (e.currentTarget as HTMLElement).style.transform = ""; (e.currentTarget as HTMLElement).style.boxShadow = "0 4px 0 var(--ink)"; }}
+              >
+                <div style={{ width: 32, height: 32, borderRadius: 8, background: "var(--green)", color: "white", display: "grid", placeItems: "center", fontWeight: 900, fontSize: 14, boxShadow: "0 2px 0 var(--green-dark)" }}>
+                  {lastUser.charAt(0).toUpperCase()}
+                </div>
+                <div style={{ textAlign: "left" }}>
+                  <div style={{ fontSize: 14, fontWeight: 900, color: "var(--ink)" }}>Continue as {lastUser}</div>
+                  <div style={{ fontSize: 11, fontFamily: "var(--mono)", color: "var(--ink-3)" }}>
+                    {streak.currentStreak > 0 ? `🔥 ${streak.currentStreak}-day streak · ` : ""}
+                    {streak.isDueToday ? "drill due today" : "all caught up"}
+                  </div>
+                </div>
+              </button>
+            );
+          })()}
 
           {/* Social proof stats */}
           <div style={{ marginTop: 56, display: "flex", gap: 40 }}>
