@@ -293,8 +293,11 @@ export default function Home() {
           {tab === "weaknesses" && (
             <WeaknessDashboard
               mistakes={mistakes}
+              games={games}
               username={username}
               totalGames={games.length}
+              openingStats={openingStats}
+              eloPrediction={eloPrediction}
             />
           )}
 

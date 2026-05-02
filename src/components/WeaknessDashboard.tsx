@@ -1,9 +1,12 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import type { StoredMistake } from "@/lib/db";
+import type { StoredMistake, StoredGame } from "@/lib/db";
+import type { OpeningStats } from "@/lib/openings";
+import type { EloPrediction } from "@/lib/elo-prediction";
 import { aggregateMistakeStats } from "@/lib/analysis";
 import { clusterMistakes, type WeaknessCluster } from "@/lib/clustering";
+import { buildExport, downloadJson } from "@/lib/export";
 import MistakeCard from "./MistakeCard";
 import GameReview from "./GameReview";
 import WeaknessClusterCard from "./WeaknessClusterCard";
@@ -14,14 +17,20 @@ import PuzzleMode from "./PuzzleMode";
 
 interface Props {
   mistakes: StoredMistake[];
+  games: StoredGame[];
   username: string;
   totalGames: number;
+  openingStats?: OpeningStats[];
+  eloPrediction?: EloPrediction | null;
 }
 
 export default function WeaknessDashboard({
   mistakes,
+  games,
   username,
   totalGames,
+  openingStats = [],
+  eloPrediction,
 }: Props) {
   const [selectedMistake, setSelectedMistake] = useState<StoredMistake | null>(null);
   const [drillCluster, setDrillCluster] = useState<WeaknessCluster | null>(null);
@@ -174,6 +183,26 @@ export default function WeaknessDashboard({
           </div>
         </section>
       )}
+
+      {/* Export */}
+      <div className="text-center pt-4">
+        <button
+          onClick={() => {
+            const data = buildExport(
+              username,
+              games,
+              mistakes,
+              clusters,
+              openingStats,
+              eloPrediction ?? null
+            );
+            downloadJson(data);
+          }}
+          className="text-zinc-600 hover:text-zinc-400 text-sm transition-colors"
+        >
+          Export analysis as JSON
+        </button>
+      </div>
     </div>
   );
 }

@@ -103,6 +103,12 @@ export default function AnalysisProgress({ progress }: Props) {
       <div className="text-center text-sm text-zinc-500">
         {mistakesFound} mistakes found so far
       </div>
+
+      {phase === "analyzing" && typeof navigator !== "undefined" && /Mobi|Android/i.test(navigator.userAgent) && (
+        <p className="text-center text-xs text-zinc-600 mt-2">
+          Analysis is CPU-intensive and may be slower on mobile devices. For best results, use a desktop browser.
+        </p>
+      )}
     </div>
   );
 }
