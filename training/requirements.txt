@@ -2,6 +2,7 @@ torch>=2.0
 numpy
 python-chess
 onnx
+onnxscript
 onnxruntime
 scikit-learn
 tqdm

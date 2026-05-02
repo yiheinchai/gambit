@@ -46,9 +46,10 @@ next-env.d.ts
 /public/onnx/*.wasm
 /public/models/*.onnx
 
-# training data and models (large)
+# training data, models, and venv (large)
 /training/data/
 /training/models/
+/training/.venv/
 
 # claude code
 /.claude/

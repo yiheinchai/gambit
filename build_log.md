@@ -57,10 +57,13 @@
 - [x] git init + initial commit (04eea46)
 - [x] Smoke tests: 26/26 passing (API, Stockfish logic, clustering, progress)
 - [x] End-to-end test: Chess.com API → PGN parsing → field mapping verified
+- [x] Mobile responsive: all components stack on small screens
+- [x] /debug page: in-browser test suite (Stockfish WASM, API, PGN, IndexedDB)
+- [x] ONNX WASM + models directories ready for concept model
+- [x] Second commit (e4125d6): diagnostics, mobile, ONNX setup
 - [ ] Deploy to Vercel
 - [ ] M2: Train concept model on Lichess PGN (needs GPU time)
-- [ ] Mobile responsive testing
-- [ ] Browser Stockfish WASM runtime test (needs manual browser check)
+- [ ] Manual browser test via /debug page
 
 ## File Structure (21 TS, 5 Python)
 ```

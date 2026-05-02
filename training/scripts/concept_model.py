@@ -80,7 +80,7 @@ def export_to_onnx(model: ConceptClassifier, path: str):
         dummy,
         path,
         export_params=True,
-        opset_version=17,
+        opset_version=18,
         do_constant_folding=True,
         input_names=["board"],
         output_names=["concepts"],
