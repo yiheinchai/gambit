@@ -156,12 +156,32 @@ Bug: training script saved to same filename as 4-layer, overwriting the producti
 
 ---
 
-## Experiment 4: Planned
+## Experiment 4: More Data (363K positions) — IN PROGRESS
 
-### Ideas Queue (ranked)
-1. **500K positions** — 4-layer transformer, same architecture, 2.5x more data
-2. **Multi-task** — predict move + Stockfish eval simultaneously
-3. **Contrastive** — train on (mistake, correct) position pairs
+**Date**: 2026-05-02
+**Estimated time**: ~40 min (363K positions, batch 512, 25 epochs on MPS — actual estimate from training script)
+
+### Hypothesis
+Experiment 3 showed that depth doesn't help with limited data. The bottleneck is data, not model capacity. 1.8x more data (363K vs 200K) with the proven 4-layer architecture should push accuracy above 18.9% and produce richer SAE features.
+
+### Setup
+- Architecture: 4-layer transformer, 128-dim, 4 heads (same as Exp 2)
+- Data: 363K positions from Lichess (PGN exhausted before 500K target)
+- Training: 25 epochs, batch 512, lr 5e-4, cosine schedule
+- Saves to `models/exp4/` to avoid overwriting production checkpoint
+
+### Status
+*(training started, checking progress on each loop iteration)*
+
+### Results
+*(pending)*
+
+---
+
+## Ideas Queue
+- **Multi-task**: predict move + Stockfish eval simultaneously
+- **Contrastive**: train on (mistake, correct) position pairs
+- **Larger PGN**: download another month of Lichess data for 1M+ positions
 
 ---
 
