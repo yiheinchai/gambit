@@ -8,9 +8,9 @@ interface Props {
 }
 
 const PRESETS = [
-  { label: "Quick", depth: 10, games: 20, time: "~5 min" },
-  { label: "Standard", depth: 14, games: 50, time: "~15 min" },
-  { label: "Deep", depth: 18, games: 100, time: "~45 min" },
+  { label: "Quick", depth: 10, games: 20, time: "~5 min", desc: "Catches big blunders" },
+  { label: "Standard", depth: 14, games: 50, time: "~15 min", desc: "Finds tactical mistakes" },
+  { label: "Deep", depth: 18, games: 100, time: "~45 min", desc: "Catches subtle errors" },
 ] as const;
 
 export default function LandingPage({ onSubmit, lastUser, onLoadCached }: Props) {
@@ -102,7 +102,7 @@ export default function LandingPage({ onSubmit, lastUser, onLoadCached }: Props)
                   cursor: "pointer", fontFamily: "var(--sans)",
                 }}
               >
-                {p.label} · {p.time}
+                <span>{p.label}</span> <span style={{ opacity: 0.7 }}>· {p.time}</span>
               </button>
             ))}
           </div>
