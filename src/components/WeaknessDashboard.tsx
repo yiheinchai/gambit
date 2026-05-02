@@ -16,6 +16,7 @@ import PuzzleMode from "./PuzzleMode";
 import DashboardHero from "./DashboardHero";
 import TopNav from "./TopNav";
 import DuoWeaknessCard from "./DuoWeaknessCard";
+import WeaknessDetail from "./WeaknessDetail";
 
 interface Props {
   mistakes: StoredMistake[];
@@ -38,6 +39,7 @@ export default function WeaknessDashboard({
   const [drillCluster, setDrillCluster] = useState<WeaknessCluster | null>(null);
   const [puzzleCluster, setPuzzleCluster] = useState<WeaknessCluster | null>(null);
   const [expandedCluster, setExpandedCluster] = useState<WeaknessCluster | null>(null);
+  const [detailCluster, setDetailCluster] = useState<{ cluster: WeaknessCluster; rank: number } | null>(null);
   const [scheduleKey, setScheduleKey] = useState(0);
 
   const stats = aggregateMistakeStats(mistakes);
@@ -70,6 +72,15 @@ export default function WeaknessDashboard({
         <PuzzleMode
           cluster={puzzleCluster}
           onClose={() => setPuzzleCluster(null)}
+        />
+      )}
+
+      {detailCluster && (
+        <WeaknessDetail
+          cluster={detailCluster.cluster}
+          rank={detailCluster.rank}
+          onDrill={() => { setDetailCluster(null); setDrillCluster(detailCluster.cluster); }}
+          onClose={() => setDetailCluster(null)}
         />
       )}
 
@@ -117,7 +128,7 @@ export default function WeaknessDashboard({
                 cluster={cluster}
                 rank={i + 1}
                 onDrill={() => setDrillCluster(cluster)}
-                onInspect={() => setExpandedCluster(cluster)}
+                onInspect={() => setDetailCluster({ cluster, rank: i + 1 })}
               />
             ))}
           </div>
