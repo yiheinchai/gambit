@@ -1,5 +1,6 @@
 import type { AnalysisProgress } from "@/lib/analysis";
 import type { StoredMistake } from "@/lib/db";
+import { CONCEPT_NAMES } from "@/lib/concept-classifier";
 
 interface Props {
   progress: AnalysisProgress;
@@ -119,7 +120,33 @@ export default function DuoLoadingScreen({ progress, username, mistakes, onStop,
                 );
               })()}
 
-              <div style={{ marginTop: 20, fontSize: 13, color: "var(--ink-3)", fontWeight: 600, textAlign: "center" }}>
+              {/* Concept bars when available */}
+              {mistakes.length > 0 && mistakes[mistakes.length - 1].conceptDiff && (() => {
+                const m = mistakes[mistakes.length - 1];
+                const topConcepts = (m.conceptDiff || [])
+                  .map((val, i) => ({ name: CONCEPT_NAMES[i] || `feature_${i}`, val }))
+                  .filter(c => c.val > 0.1 && !c.name.startsWith("feature_"))
+                  .sort((a, b) => b.val - a.val)
+                  .slice(0, 3);
+
+                if (topConcepts.length === 0) return null;
+                return (
+                  <div style={{ marginTop: 16, padding: 14, background: "var(--bg-2)", borderRadius: 12 }}>
+                    <div style={{ fontSize: 11, fontWeight: 800, color: "var(--ink-3)", letterSpacing: 0.6, textTransform: "uppercase", marginBottom: 10 }}>What you missed</div>
+                    {topConcepts.map((c, i) => (
+                      <div key={i} style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 6 }}>
+                        <div style={{ width: 110, fontSize: 12, fontWeight: 700, color: "var(--ink)" }}>{c.name.replace(/_/g, " ")}</div>
+                        <div style={{ flex: 1, height: 8, background: "white", borderRadius: 4, overflow: "hidden", border: "1px solid var(--line)" }}>
+                          <div style={{ width: `${Math.min(c.val * 100, 100)}%`, height: "100%", background: i === 0 ? "var(--orange)" : i === 1 ? "var(--purple)" : "var(--blue)" }} />
+                        </div>
+                        <div style={{ width: 32, fontSize: 11, fontFamily: "var(--mono)", color: "var(--ink-3)", textAlign: "right" }}>{c.val.toFixed(2)}</div>
+                      </div>
+                    ))}
+                  </div>
+                );
+              })()}
+
+              <div style={{ marginTop: 16, fontSize: 13, color: "var(--ink-3)", fontWeight: 600, textAlign: "center" }}>
                 {mistakesFound} mistakes found so far
               </div>
             </div>
