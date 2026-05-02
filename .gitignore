@@ -41,8 +41,10 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# stockfish wasm binaries (large, installed from npm)
+# wasm binaries (large, installed from npm via postinstall)
 /public/stockfish/*.wasm
+/public/onnx/*.wasm
+/public/models/*.onnx
 
 # training data and models (large)
 /training/data/

@@ -46,13 +46,13 @@ export default function UsernameForm({ onSubmit, loading }: UsernameFormProps) {
         </button>
       </div>
 
-      <div className="flex flex-col items-center gap-3 text-zinc-600 text-sm">
-        <div className="flex gap-6">
+      <div className="flex flex-col items-center gap-3 text-zinc-600 text-sm text-center">
+        <div className="flex flex-wrap justify-center gap-x-6 gap-y-2">
           <Feature text="Stockfish-powered analysis" />
           <Feature text="Weakness clustering" />
           <Feature text="Targeted drills" />
         </div>
-        <p>All analysis runs locally in your browser. No data is sent to any server.</p>
+        <p className="max-w-sm">All analysis runs locally in your browser. No data is sent to any server.</p>
       </div>
     </form>
   );

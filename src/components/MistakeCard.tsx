@@ -20,8 +20,8 @@ export default function MistakeCard({ mistake, onClick }: Props) {
       className="bg-zinc-800 border border-zinc-700 rounded-lg p-4 cursor-pointer hover:border-zinc-500 transition-colors"
       onClick={onClick}
     >
-      <div className="flex gap-4">
-        <div className="w-36 h-36 flex-shrink-0">
+      <div className="flex gap-3 sm:gap-4">
+        <div className="w-24 h-24 sm:w-36 sm:h-36 flex-shrink-0">
           <Chessboard
             options={{
               position: mistake.fen,

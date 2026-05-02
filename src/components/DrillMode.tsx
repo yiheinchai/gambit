@@ -196,7 +196,7 @@ export default function DrillMode({ cluster, onClose }: Props) {
 
         {/* Board + Info */}
         <div className="p-6">
-          <div className="grid grid-cols-1 md:grid-cols-[1fr_300px] gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-[1fr_280px] gap-4 sm:gap-6">
             <div>
               {/* Instruction */}
               <div className="mb-3 text-center">

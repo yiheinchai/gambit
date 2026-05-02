@@ -54,11 +54,13 @@
 - [x] .env.example for ANTHROPIC_API_KEY
 
 ## Remaining (Deploy / Research)
-- [ ] git init + initial commit
+- [x] git init + initial commit (04eea46)
+- [x] Smoke tests: 26/26 passing (API, Stockfish logic, clustering, progress)
+- [x] End-to-end test: Chess.com API → PGN parsing → field mapping verified
 - [ ] Deploy to Vercel
 - [ ] M2: Train concept model on Lichess PGN (needs GPU time)
 - [ ] Mobile responsive testing
-- [ ] End-to-end smoke test in browser
+- [ ] Browser Stockfish WASM runtime test (needs manual browser check)
 
 ## File Structure (21 TS, 5 Python)
 ```

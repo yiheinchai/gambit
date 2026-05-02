@@ -74,8 +74,8 @@ export default function GameReview({ mistake, onClose }: Props) {
           </button>
         </div>
 
-        <div className="p-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="p-4 sm:p-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
             {/* Position before the mistake */}
             <div>
               <p className="text-zinc-400 text-sm mb-2 text-center">

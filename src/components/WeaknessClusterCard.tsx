@@ -40,9 +40,9 @@ export default function WeaknessClusterCard({ cluster, onDrill, onExpand }: Prop
       className={`border rounded-xl p-5 ${severityColors[cluster.severity]} cursor-pointer hover:border-zinc-500 transition-colors`}
       onClick={() => onExpand(cluster)}
     >
-      <div className="flex gap-5">
+      <div className="flex flex-col sm:flex-row gap-4 sm:gap-5">
         {previewMistake && (
-          <div className="w-32 h-32 flex-shrink-0 rounded-lg overflow-hidden">
+          <div className="w-24 h-24 sm:w-32 sm:h-32 flex-shrink-0 rounded-lg overflow-hidden">
             <Chessboard
               options={{
                 position: previewMistake.fen,
