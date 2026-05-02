@@ -135,13 +135,13 @@ export default function PuzzleMode({ cluster, onClose }: Props) {
 
   if (puzzles.length === 0) {
     return (
-      <div className="fixed inset-0 bg-black/90 flex items-center justify-center z-50 p-4">
-        <div className="bg-zinc-800 rounded-xl border border-zinc-700 max-w-md w-full p-8 text-center">
-          <h2 className="text-xl font-bold text-white mb-2">No Puzzles Available</h2>
-          <p className="text-zinc-400 mb-4">
+      <div style={{ position: "fixed", inset: 0, background: "rgba(27,39,48,0.85)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 50, padding: 16 }}>
+        <div style={{ background: "white", border: "3px solid var(--ink)", borderRadius: 24, boxShadow: "0 8px 0 var(--ink)", maxWidth: 400, width: "100%", padding: 32, textAlign: "center" }}>
+          <h2 style={{ fontSize: 22, fontWeight: 900, color: "var(--ink)", marginBottom: 8 }}>No Puzzles Available</h2>
+          <p style={{ color: "var(--ink-2)", fontSize: 14, marginBottom: 16 }}>
             No matching puzzles for this weakness pattern yet.
           </p>
-          <button onClick={onClose} className="px-4 py-2 bg-zinc-700 text-zinc-300 rounded-lg">
+          <button onClick={onClose} style={{ background: "var(--bg-2)", border: "2px solid var(--line)", padding: "10px 20px", borderRadius: 12, fontWeight: 800, fontSize: 13, cursor: "pointer", fontFamily: "var(--sans)" }}>
             Back
           </button>
         </div>
@@ -151,23 +151,23 @@ export default function PuzzleMode({ cluster, onClose }: Props) {
 
   if (puzzleState === "complete") {
     return (
-      <div className="fixed inset-0 bg-black/90 flex items-center justify-center z-50 p-4">
-        <div className="bg-zinc-800 rounded-xl border border-zinc-700 max-w-md w-full p-8 text-center">
-          <h2 className="text-2xl font-bold text-white mb-2">Puzzles Complete</h2>
-          <p className="text-zinc-400 mb-6">{cluster.label}</p>
-          <div className="grid grid-cols-2 gap-4 mb-6">
-            <div>
-              <p className="text-3xl font-bold text-green-400">{correct}</p>
-              <p className="text-zinc-500 text-sm">Solved</p>
+      <div style={{ position: "fixed", inset: 0, background: "rgba(27,39,48,0.85)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 50, padding: 16 }}>
+        <div style={{ background: "white", border: "3px solid var(--ink)", borderRadius: 24, boxShadow: "0 8px 0 var(--ink)", maxWidth: 440, width: "100%", padding: 32, textAlign: "center" }}>
+          <h2 style={{ fontSize: 28, fontWeight: 900, color: "var(--ink)", marginBottom: 8 }}>Puzzles Complete</h2>
+          <p style={{ color: "var(--ink-3)", fontSize: 14, fontWeight: 600, marginBottom: 24 }}>{cluster.label}</p>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 24 }}>
+            <div style={{ background: "var(--bg-2)", borderRadius: 14, padding: 14 }}>
+              <p style={{ fontSize: 32, fontWeight: 900, color: "var(--green)", letterSpacing: -1 }}>{correct}</p>
+              <p style={{ fontSize: 11, fontWeight: 700, color: "var(--ink-3)", textTransform: "uppercase", letterSpacing: 0.4 }}>Solved</p>
             </div>
-            <div>
-              <p className="text-3xl font-bold text-amber-400">
+            <div style={{ background: "var(--bg-2)", borderRadius: 14, padding: 14 }}>
+              <p style={{ fontSize: 32, fontWeight: 900, color: "var(--orange)", letterSpacing: -1 }}>
                 {total > 0 ? Math.round((correct / total) * 100) : 0}%
               </p>
-              <p className="text-zinc-500 text-sm">Accuracy</p>
+              <p style={{ fontSize: 11, fontWeight: 700, color: "var(--ink-3)", textTransform: "uppercase", letterSpacing: 0.4 }}>Accuracy</p>
             </div>
           </div>
-          <button onClick={onClose} className="px-6 py-3 bg-amber-600 hover:bg-amber-500 text-white font-medium rounded-lg">
+          <button onClick={onClose} className="btn-duo" style={{ background: "var(--green)", color: "white", padding: "16px 28px", borderRadius: 14, fontSize: 14, boxShadow: "0 4px 0 var(--green-dark)", width: "100%" }}>
             Back to Dashboard
           </button>
         </div>
@@ -176,39 +176,39 @@ export default function PuzzleMode({ cluster, onClose }: Props) {
   }
 
   return (
-    <div className="fixed inset-0 bg-black/90 flex items-center justify-center z-50 p-4">
-      <div className="bg-zinc-800 rounded-xl border border-zinc-700 max-w-3xl w-full max-h-[95vh] overflow-y-auto">
-        <div className="flex justify-between items-center p-4 border-b border-zinc-700">
+    <div style={{ position: "fixed", inset: 0, background: "var(--bg)", zIndex: 50, overflow: "auto", fontFamily: "var(--sans)" }}>
+      <div style={{ maxWidth: 800, margin: "0 auto", padding: "20px 32px" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
           <div>
-            <h2 className="text-white font-semibold">Practice Puzzles — {cluster.label}</h2>
-            <p className="text-zinc-500 text-sm">
+            <h2 style={{ fontSize: 18, fontWeight: 900, color: "var(--ink)" }}>Practice Puzzles — {cluster.label}</h2>
+            <p style={{ fontSize: 12, fontFamily: "var(--mono)", color: "var(--ink-3)" }}>
               Puzzle {puzzleIdx + 1} of {puzzles.length}
               {currentPuzzle && (
-                <span className="ml-2 text-zinc-600">
+                <span style={{ marginLeft: 8 }}>
                   Rating: {currentPuzzle.rating} | {currentPuzzle.theme}
                 </span>
               )}
             </p>
           </div>
-          <button onClick={onClose} className="text-zinc-500 hover:text-white text-xl">x</button>
+          <button onClick={onClose} style={{ background: "white", border: "2px solid var(--line)", padding: "8px 16px", borderRadius: 12, fontWeight: 800, fontSize: 13, cursor: "pointer", fontFamily: "var(--sans)", color: "var(--ink-2)" }}>Exit</button>
         </div>
 
-        <div className="p-4 sm:p-6">
-          <div className="mb-3 text-center">
+        <div style={{ background: "white", border: "3px solid var(--ink)", borderRadius: 22, padding: 22, boxShadow: "0 6px 0 var(--ink)" }}>
+          <div style={{ textAlign: "center", marginBottom: 12 }}>
             {puzzleState === "thinking" && (
-              <p className="text-zinc-300">Find the best move.</p>
+              <p style={{ color: "var(--ink)", fontWeight: 700, fontSize: 15 }}>Find the best move.</p>
             )}
             {puzzleState === "correct" && (
-              <p className="text-green-400 font-medium">Correct!</p>
+              <p style={{ color: "var(--green-dark)", fontWeight: 900, fontSize: 15 }}>Correct!</p>
             )}
             {puzzleState === "incorrect" && (
-              <p className="text-red-400 font-medium">
+              <p style={{ color: "var(--red)", fontWeight: 900, fontSize: 15 }}>
                 Incorrect. Solution was {currentPuzzle?.solution[moveIdx]}.
               </p>
             )}
           </div>
 
-          <div className="aspect-square max-w-lg mx-auto">
+          <div style={{ maxWidth: 480, margin: "0 auto" }}>
             <Chessboard
               options={{
                 position: currentFen,
@@ -221,18 +221,19 @@ export default function PuzzleMode({ cluster, onClose }: Props) {
           </div>
 
           {(puzzleState === "correct" || puzzleState === "incorrect") && (
-            <div className="flex justify-center mt-4">
+            <div style={{ display: "flex", justifyContent: "center", marginTop: 16 }}>
               <button
                 onClick={handleNextPuzzle}
-                className="px-4 py-2 bg-amber-600 hover:bg-amber-500 text-white text-sm font-medium rounded-lg"
+                className="btn-duo"
+                style={{ background: "var(--green)", color: "white", padding: "14px 22px", borderRadius: 14, fontSize: 13, letterSpacing: 0.6, boxShadow: "0 4px 0 var(--green-dark)" }}
               >
                 {puzzleIdx + 1 >= puzzles.length ? "Finish" : "Next Puzzle"}{" "}
-                <kbd className="ml-1 text-xs text-amber-300/60">Enter</kbd>
+                <kbd style={{ fontSize: 10, color: "rgba(255,255,255,0.6)", marginLeft: 6 }}>Enter</kbd>
               </button>
             </div>
           )}
 
-          <div className="flex justify-center gap-4 mt-3 text-xs text-zinc-500">
+          <div style={{ display: "flex", justifyContent: "center", gap: 16, marginTop: 12, fontSize: 11, color: "var(--ink-3)" }}>
             <span>Solved: {correct}/{total}</span>
             <span>Esc to exit</span>
           </div>
