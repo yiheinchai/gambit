@@ -18,6 +18,7 @@ import TopNav from "./TopNav";
 import DuoWeaknessCard from "./DuoWeaknessCard";
 import WeaknessDetail from "./WeaknessDetail";
 import GameReviewScreen from "./GameReviewScreen";
+import Toast from "./Toast";
 import { getMistakesByGameId } from "@/lib/db";
 
 interface Props {
@@ -45,6 +46,7 @@ export default function WeaknessDashboard({
   const [expandedCluster, setExpandedCluster] = useState<WeaknessCluster | null>(null);
   const [detailCluster, setDetailCluster] = useState<{ cluster: WeaknessCluster; rank: number } | null>(null);
   const [reviewGame, setReviewGame] = useState<{ game: StoredGame; mistakes: StoredMistake[] } | null>(null);
+  const [toastMsg, setToastMsg] = useState<string | null>(null);
   const [scheduleKey, setScheduleKey] = useState(0);
 
   const stats = aggregateMistakeStats(mistakes);
@@ -69,6 +71,7 @@ export default function WeaknessDashboard({
           onClose={() => {
             setDrillCluster(null);
             setScheduleKey((k) => k + 1);
+            setToastMsg("Drill complete! 🔥 Keep it up.");
           }}
         />
       )}
@@ -96,6 +99,8 @@ export default function WeaknessDashboard({
           onClose={() => setDetailCluster(null)}
         />
       )}
+
+      {toastMsg && <Toast message={toastMsg} onDone={() => setToastMsg(null)} />}
 
       {/* Top nav */}
       <TopNav active="weaknesses" username={username} onNavigate={onNavigate} />
