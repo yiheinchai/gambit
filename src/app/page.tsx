@@ -13,6 +13,7 @@ import {
 import { analyzeAndStoreGame, type AnalysisProgress } from "@/lib/analysis";
 import { computeProgress, type ProgressData } from "@/lib/progress";
 import { computeOpeningStats, type OpeningStats } from "@/lib/openings";
+import { predictEloGain, type EloPrediction } from "@/lib/elo-prediction";
 import type { StoredMistake, StoredGame } from "@/lib/db";
 import {
   getAnalyzedGameIds,
@@ -39,6 +40,7 @@ export default function Home() {
   const [games, setGames] = useState<StoredGame[]>([]);
   const [progressData, setProgressData] = useState<ProgressData | null>(null);
   const [openingStats, setOpeningStats] = useState<OpeningStats[]>([]);
+  const [eloPrediction, setEloPrediction] = useState<EloPrediction | null>(null);
   const [error, setError] = useState<string | null>(null);
   const cancelledRef = useRef(false);
   const [lastUser, setLastUser] = useState<string | null>(null);
@@ -49,6 +51,15 @@ export default function Home() {
     if (saved) setLastUser(saved);
   }, []);
 
+  const computeDerivedData = useCallback((g: StoredGame[], m: StoredMistake[]) => {
+    setProgressData(computeProgress(g, m));
+    setOpeningStats(computeOpeningStats(g, m));
+    const latestElo = g.length > 0
+      ? [...g].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())[0].playerElo
+      : 1200;
+    setEloPrediction(predictEloGain(m, latestElo, g.length));
+  }, []);
+
   const loadCachedUser = useCallback(async (name: string) => {
     const cachedGames = await getGamesByUsername(name.toLowerCase());
     const cachedMistakes = await getMistakesByUsername(name.toLowerCase());
@@ -57,18 +68,16 @@ export default function Home() {
     setUsername(name);
     setGames(cachedGames);
     setMistakes(cachedMistakes);
-    setProgressData(computeProgress(cachedGames, cachedMistakes));
-    setOpeningStats(computeOpeningStats(cachedGames, cachedMistakes));
+    computeDerivedData(cachedGames, cachedMistakes);
     setState("results");
-  }, []);
+  }, [computeDerivedData]);
 
   const showResults = useCallback(() => {
     if (mistakes.length > 0 && games.length > 0) {
-      setProgressData(computeProgress(games, mistakes));
-      setOpeningStats(computeOpeningStats(games, mistakes));
+      computeDerivedData(games, mistakes);
       setState("results");
     }
-  }, [mistakes, games]);
+  }, [mistakes, games, computeDerivedData]);
 
   const handleCancel = useCallback(() => {
     cancelledRef.current = true;
@@ -111,8 +120,7 @@ export default function Home() {
       if (newGames.length === 0) {
         setMistakes(allMistakes);
         setGames(allGames);
-        setProgressData(computeProgress(allGames, allMistakes));
-        setOpeningStats(computeOpeningStats(allGames, allMistakes));
+        computeDerivedData(allGames, allMistakes);
         setProgress((p) => ({ ...p, phase: "done" }));
         setState("results");
         return;
@@ -172,8 +180,7 @@ export default function Home() {
       }
 
       if (!cancelledRef.current) {
-        setProgressData(computeProgress(allGames, allMistakes));
-        setOpeningStats(computeOpeningStats(allGames, allMistakes));
+        computeDerivedData(allGames, allMistakes);
         setProgress((p) => ({ ...p, phase: "done" }));
         setState("results");
       }
@@ -292,7 +299,13 @@ export default function Home() {
           )}
 
           {tab === "progress" && progressData && (
-            <ProgressView progress={progressData} username={username} openingStats={openingStats} />
+            <ProgressView
+              progress={progressData}
+              username={username}
+              openingStats={openingStats}
+              eloPrediction={eloPrediction || undefined}
+              onRefresh={() => handleAnalyze({ username, depth: 14, gameCount: 50 })}
+            />
           )}
 
           <div className="mt-8 text-center">

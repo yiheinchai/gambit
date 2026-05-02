@@ -2,6 +2,7 @@
 
 import type { ProgressData } from "@/lib/progress";
 import type { OpeningStats as OpeningStatsType } from "@/lib/openings";
+import type { EloPrediction } from "@/lib/elo-prediction";
 import { LineChart, BarChart } from "./Charts";
 import OpeningStats from "./OpeningStats";
 
@@ -9,13 +10,21 @@ interface Props {
   progress: ProgressData;
   username: string;
   openingStats?: OpeningStatsType[];
+  eloPrediction?: EloPrediction;
+  onRefresh?: () => void;
 }
 
 function formatDate(d: Date): string {
   return `${d.getMonth() + 1}/${d.getDate()}`;
 }
 
-export default function ProgressView({ progress, username, openingStats }: Props) {
+export default function ProgressView({
+  progress,
+  username,
+  openingStats,
+  eloPrediction,
+  onRefresh,
+}: Props) {
   const { overallStats, eloHistory, mistakeRateTrend, blunderRateTrend, phaseBreakdown } =
     progress;
 
@@ -26,10 +35,40 @@ export default function ProgressView({ progress, username, openingStats }: Props
 
   return (
     <div className="space-y-6">
-      <div className="text-center">
-        <h2 className="text-2xl font-bold text-white">{username} — Progress</h2>
-        <p className="text-zinc-500 text-sm">{overallStats.totalGames} games analyzed</p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-2xl font-bold text-white">{username} — Progress</h2>
+          <p className="text-zinc-500 text-sm">{overallStats.totalGames} games analyzed</p>
+        </div>
+        {onRefresh && (
+          <button
+            onClick={onRefresh}
+            className="px-4 py-2 bg-zinc-700 hover:bg-zinc-600 text-zinc-300 text-sm rounded-lg transition-colors"
+          >
+            Add New Games
+          </button>
+        )}
       </div>
+
+      {/* Elo prediction */}
+      {eloPrediction && eloPrediction.potentialGain > 0 && (
+        <div className="bg-gradient-to-r from-amber-900/20 to-zinc-800 border border-amber-700/30 rounded-lg p-4">
+          <div className="flex items-center gap-3 mb-3">
+            <span className="text-2xl font-bold text-amber-400">
+              +{eloPrediction.potentialGain}
+            </span>
+            <span className="text-zinc-400 text-sm">estimated Elo gain potential</span>
+          </div>
+          <div className="space-y-1.5">
+            {eloPrediction.topImprovements.map((imp, i) => (
+              <div key={i} className="flex items-center justify-between text-sm">
+                <span className="text-zinc-400">{imp.label}</span>
+                <span className="text-green-400 font-medium">+{imp.eloGain} Elo</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Summary stats */}
       <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
@@ -69,7 +108,6 @@ export default function ProgressView({ progress, username, openingStats }: Props
           }))}
           color="#60a5fa"
         />
-
         <LineChart
           title="Mistakes Per Game (Rolling Avg)"
           data={mistakeRateTrend.map((p) => ({
@@ -79,7 +117,6 @@ export default function ProgressView({ progress, username, openingStats }: Props
           color="#f59e0b"
           valueFormat={(v) => v.toFixed(1)}
         />
-
         <LineChart
           title="Blunders Per Game (Rolling Avg)"
           data={blunderRateTrend.map((p) => ({
@@ -89,7 +126,6 @@ export default function ProgressView({ progress, username, openingStats }: Props
           color="#ef4444"
           valueFormat={(v) => v.toFixed(1)}
         />
-
         <BarChart
           title="Mistakes by Game Phase"
           data={[
