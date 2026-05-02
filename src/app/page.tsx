@@ -12,6 +12,7 @@ import {
 } from "@/lib/chesscom-api";
 import { analyzeAndStoreGame, type AnalysisProgress } from "@/lib/analysis";
 import { computeProgress, type ProgressData } from "@/lib/progress";
+import { computeOpeningStats, type OpeningStats } from "@/lib/openings";
 import type { StoredMistake, StoredGame } from "@/lib/db";
 import {
   getAnalyzedGameIds,
@@ -37,12 +38,14 @@ export default function Home() {
   const [mistakes, setMistakes] = useState<StoredMistake[]>([]);
   const [games, setGames] = useState<StoredGame[]>([]);
   const [progressData, setProgressData] = useState<ProgressData | null>(null);
+  const [openingStats, setOpeningStats] = useState<OpeningStats[]>([]);
   const [error, setError] = useState<string | null>(null);
   const cancelledRef = useRef(false);
 
   const showResults = useCallback(() => {
     if (mistakes.length > 0 && games.length > 0) {
       setProgressData(computeProgress(games, mistakes));
+      setOpeningStats(computeOpeningStats(games, mistakes));
       setState("results");
     }
   }, [mistakes, games]);
@@ -88,6 +91,7 @@ export default function Home() {
         setMistakes(allMistakes);
         setGames(allGames);
         setProgressData(computeProgress(allGames, allMistakes));
+        setOpeningStats(computeOpeningStats(allGames, allMistakes));
         setProgress((p) => ({ ...p, phase: "done" }));
         setState("results");
         return;
@@ -148,6 +152,7 @@ export default function Home() {
 
       if (!cancelledRef.current) {
         setProgressData(computeProgress(allGames, allMistakes));
+        setOpeningStats(computeOpeningStats(allGames, allMistakes));
         setProgress((p) => ({ ...p, phase: "done" }));
         setState("results");
       }
@@ -256,7 +261,7 @@ export default function Home() {
           )}
 
           {tab === "progress" && progressData && (
-            <ProgressView progress={progressData} username={username} />
+            <ProgressView progress={progressData} username={username} openingStats={openingStats} />
           )}
 
           <div className="mt-8 text-center">

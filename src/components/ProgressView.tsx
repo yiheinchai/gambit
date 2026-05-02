@@ -1,18 +1,21 @@
 "use client";
 
 import type { ProgressData } from "@/lib/progress";
+import type { OpeningStats as OpeningStatsType } from "@/lib/openings";
 import { LineChart, BarChart } from "./Charts";
+import OpeningStats from "./OpeningStats";
 
 interface Props {
   progress: ProgressData;
   username: string;
+  openingStats?: OpeningStatsType[];
 }
 
 function formatDate(d: Date): string {
   return `${d.getMonth() + 1}/${d.getDate()}`;
 }
 
-export default function ProgressView({ progress, username }: Props) {
+export default function ProgressView({ progress, username, openingStats }: Props) {
   const { overallStats, eloHistory, mistakeRateTrend, blunderRateTrend, phaseBreakdown } =
     progress;
 
@@ -96,6 +99,11 @@ export default function ProgressView({ progress, username }: Props) {
           ]}
         />
       </div>
+
+      {/* Opening stats */}
+      {openingStats && openingStats.length > 0 && (
+        <OpeningStats stats={openingStats} />
+      )}
 
       {/* Recent results */}
       <div className="bg-zinc-800 border border-zinc-700 rounded-lg p-4">
