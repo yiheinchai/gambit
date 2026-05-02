@@ -36,7 +36,9 @@ export default function DashboardHero({
           {streak.currentStreak > 0 ? `🔥 ${streak.currentStreak}-day streak · ` : ""}{username} · {totalGames} games
         </div>
         <h1 style={{ fontSize: 34, fontWeight: 900, letterSpacing: -1, margin: "10px 0 4px", lineHeight: 1.1 }}>
-          {potentialGain > 0 ? (
+          {streak.isDueToday && streak.currentStreak > 0 ? (
+            <>Keep your {streak.currentStreak}-day streak alive.</>
+          ) : potentialGain > 0 ? (
             <>Your weaknesses are costing you ~{potentialGain} Elo.</>
           ) : (
             <>{totalMistakes} mistakes found across {totalGames} games.</>
@@ -44,8 +46,12 @@ export default function DashboardHero({
         </h1>
         {topCluster && (
           <p style={{ fontSize: 15, opacity: 0.92, fontWeight: 500, maxWidth: 520, margin: "8px 0 18px" }}>
-            Your biggest weakness: <b>{topCluster.label}</b> ({topCluster.frequency} occurrences).
-            {potentialGain > 10 && <> Drilling this pattern could gain you <b>+{Math.round(potentialGain * 0.4)} Elo</b>.</>}
+            {streak.isDueToday ? (
+              <>Start with <b>{topCluster.label}</b> — your biggest weakness ({topCluster.frequency} occurrences).</>
+            ) : (
+              <>Your biggest weakness: <b>{topCluster.label}</b> ({topCluster.frequency} occurrences).
+              {potentialGain > 10 && <> Drilling could gain you <b>+{Math.round(potentialGain * 0.4)} Elo</b>.</>}</>
+            )}
           </p>
         )}
         <div style={{ display: "flex", gap: 10 }}>

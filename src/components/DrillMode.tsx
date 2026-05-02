@@ -230,12 +230,21 @@ export default function DrillMode({ cluster, onClose }: Props) {
             {/* Instruction */}
             <div style={{ textAlign: "center", marginBottom: 12 }}>
               {drillState === "thinking" && (
-                <p style={{ color: "var(--ink)", fontWeight: 700, fontSize: 15 }}>
-                  Find the best move.
-                  <span style={{ color: "var(--ink-3)", fontSize: 12, marginLeft: 8, fontFamily: "var(--mono)" }}>
-                    move {currentPosition?.moveNumber}
-                  </span>
-                </p>
+                <>
+                  <p style={{ color: "var(--ink)", fontWeight: 700, fontSize: 15 }}>
+                    Find the best move.
+                    <span style={{ color: "var(--ink-3)", fontSize: 12, marginLeft: 8, fontFamily: "var(--mono)" }}>
+                      move {currentPosition?.moveNumber}
+                    </span>
+                  </p>
+                  {currentPosition && (
+                    <p style={{ fontSize: 12, color: "var(--ink-3)", marginTop: 4 }}>
+                      You originally played <b style={{ color: "var(--orange-dark)", fontFamily: "var(--mono)" }}>
+                        {cluster.mistakes.find(m => m.id === currentPosition.mistakeId)?.movePlayed || "?"}
+                      </b> here — can you find something better?
+                    </p>
+                  )}
+                </>
               )}
               {drillState === "evaluating" && (
                 <p style={{ color: "var(--ink-3)", fontWeight: 600 }}>Evaluating your move...</p>
