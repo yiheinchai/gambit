@@ -201,159 +201,128 @@ export default function DrillMode({ cluster, onClose }: Props) {
   }
 
   return (
-    <div className="fixed inset-0 bg-black/90 flex items-center justify-center z-50 p-4">
-      <div className="bg-zinc-800 rounded-xl border border-zinc-700 max-w-4xl w-full max-h-[95vh] overflow-y-auto">
+    <div style={{ position: "fixed", inset: 0, background: "var(--bg)", zIndex: 50, overflow: "auto", fontFamily: "var(--sans)" }}>
+      <div style={{ maxWidth: 1280, margin: "0 auto", padding: "20px 40px" }}>
         {/* Header */}
-        <div className="flex justify-between items-center p-4 border-b border-zinc-700">
-          <div>
-            <h2 className="text-white font-semibold">{cluster.label}</h2>
-            <p className="text-zinc-500 text-sm">
-              Position {positionIndex + 1} of {session.positions.length}
-            </p>
-          </div>
-          <div className="flex items-center gap-4">
-            <div className="text-sm text-zinc-400">
-              {stats.correct}/{stats.total} correct
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+            <div style={{ width: 36, height: 36, borderRadius: 10, background: "var(--green)", display: "grid", placeItems: "center", color: "white", fontWeight: 900, fontSize: 18, boxShadow: "0 3px 0 var(--green-dark)" }}>♞</div>
+            <div>
+              <div style={{ fontSize: 16, fontWeight: 900, color: "var(--ink)" }}>{cluster.label}</div>
+              <div style={{ fontSize: 12, fontFamily: "var(--mono)", color: "var(--ink-3)" }}>
+                Position {positionIndex + 1} of {session.positions.length} · {stats.correct}/{stats.total} correct
+              </div>
             </div>
-            <button
-              onClick={onClose}
-              className="text-zinc-500 hover:text-white text-xl leading-none"
-            >
-              x
-            </button>
           </div>
+          <button
+            onClick={onClose}
+            style={{ background: "white", border: "2px solid var(--line)", padding: "8px 16px", borderRadius: 12, fontWeight: 800, fontSize: 13, cursor: "pointer", fontFamily: "var(--sans)", color: "var(--ink-2)" }}
+          >
+            Exit
+          </button>
         </div>
 
-        {/* Board + Info */}
-        <div className="p-6">
-          <div className="grid grid-cols-1 md:grid-cols-[1fr_280px] gap-4 sm:gap-6">
-            <div>
-              {/* Instruction */}
-              <div className="mb-3 text-center">
-                {drillState === "thinking" && (
-                  <p className="text-zinc-300">
-                    Find the best move.
-                    <span className="text-zinc-500 text-sm ml-2">
-                      (Move {currentPosition?.moveNumber} from your game)
-                    </span>
-                  </p>
-                )}
-                {drillState === "evaluating" && (
-                  <p className="text-zinc-400">Evaluating your move...</p>
-                )}
-                {drillState === "correct" && (
-                  <p className="text-green-400 font-medium">
-                    Correct! You played {lastAttempt?.movePlayed}
-                  </p>
-                )}
-                {drillState === "incorrect" && (
-                  <p className="text-red-400 font-medium">
-                    Not quite. You played {lastAttempt?.movePlayed} (-
-                    {lastAttempt?.cpLoss}cp). Best was {lastAttempt?.bestMove}.
-                  </p>
-                )}
-              </div>
-
-              {/* Board */}
-              <div className="aspect-square max-w-lg mx-auto">
-                <Chessboard
-                  options={{
-                    position: currentFen,
-                    allowDragging: drillState === "thinking",
-                    boardOrientation: currentPosition?.playerColor || "white",
-                    darkSquareStyle: { backgroundColor: "#779952" },
-                    lightSquareStyle: { backgroundColor: "#edeed1" },
-                    onPieceDrop: handleDrop,
-                  }}
-                />
-              </div>
-
-              {/* Action buttons */}
-              <div className="flex flex-col items-center gap-2 mt-4">
-                {(drillState === "correct" || drillState === "incorrect") && (
-                  <>
-                    <div className="flex gap-3">
-                      {drillState === "incorrect" && (
-                        <button
-                          onClick={handleRetry}
-                          className="px-4 py-2 bg-zinc-700 hover:bg-zinc-600 text-zinc-300 text-sm rounded-lg transition-colors"
-                        >
-                          Retry <kbd className="ml-1 text-xs text-zinc-500">R</kbd>
-                        </button>
-                      )}
-                      <button
-                        onClick={handleNext}
-                        className="px-4 py-2 bg-amber-600 hover:bg-amber-500 text-white text-sm font-medium rounded-lg transition-colors"
-                      >
-                        {positionIndex + 1 >= session.positions.length
-                          ? "Finish"
-                          : "Next"}{" "}
-                        <kbd className="ml-1 text-xs text-amber-300/60">Enter</kbd>
-                      </button>
-                    </div>
-                    <p className="text-zinc-600 text-xs">Esc to exit</p>
-                  </>
-                )}
-              </div>
-            </div>
-
-            {/* Side panel */}
-            <div className="space-y-4">
-              <div className="bg-zinc-900 rounded-lg p-4">
-                <h4 className="text-zinc-400 text-xs uppercase tracking-wider mb-2">
-                  Session Progress
-                </h4>
-                <div className="w-full bg-zinc-700 rounded-full h-2 mb-2">
-                  <div
-                    className="bg-amber-500 h-2 rounded-full transition-all"
-                    style={{
-                      width: `${((positionIndex + (drillState !== "thinking" ? 1 : 0)) / session.positions.length) * 100}%`,
-                    }}
-                  />
-                </div>
-                <div className="grid grid-cols-2 gap-2 text-sm">
-                  <div>
-                    <span className="text-green-400 font-medium">{stats.correct}</span>
-                    <span className="text-zinc-500 ml-1">correct</span>
-                  </div>
-                  <div>
-                    <span className="text-red-400 font-medium">{stats.incorrect}</span>
-                    <span className="text-zinc-500 ml-1">incorrect</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Recent attempts */}
-              {attempts.length > 0 && (
-                <div className="bg-zinc-900 rounded-lg p-4">
-                  <h4 className="text-zinc-400 text-xs uppercase tracking-wider mb-2">
-                    Recent Attempts
-                  </h4>
-                  <div className="space-y-1.5 max-h-48 overflow-y-auto">
-                    {[...attempts].reverse().slice(0, 8).map((a, i) => (
-                      <div
-                        key={i}
-                        className="flex items-center gap-2 text-xs"
-                      >
-                        <span
-                          className={`w-1.5 h-1.5 rounded-full ${a.isCorrect ? "bg-green-400" : "bg-red-400"}`}
-                        />
-                        <span className="text-zinc-400 font-mono">
-                          {a.movePlayed}
-                        </span>
-                        {!a.isCorrect && (
-                          <span className="text-zinc-600">
-                            (best: {a.bestMove})
-                          </span>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                </div>
+        {/* Board area — Duo style */}
+        <div style={{ display: "grid", gridTemplateColumns: "1fr", gap: 16 }}>
+          <div style={{ background: "white", border: "3px solid var(--ink)", borderRadius: 22, padding: 22, boxShadow: "0 6px 0 var(--ink)" }}>
+            {/* Instruction */}
+            <div style={{ textAlign: "center", marginBottom: 12 }}>
+              {drillState === "thinking" && (
+                <p style={{ color: "var(--ink)", fontWeight: 700, fontSize: 15 }}>
+                  Find the best move.
+                  <span style={{ color: "var(--ink-3)", fontSize: 12, marginLeft: 8, fontFamily: "var(--mono)" }}>
+                    move {currentPosition?.moveNumber}
+                  </span>
+                </p>
+              )}
+              {drillState === "evaluating" && (
+                <p style={{ color: "var(--ink-3)", fontWeight: 600 }}>Evaluating your move...</p>
               )}
             </div>
+
+            {/* Board */}
+            <div style={{ maxWidth: 480, margin: "0 auto" }}>
+              <Chessboard
+                options={{
+                  position: currentFen,
+                  allowDragging: drillState === "thinking",
+                  boardOrientation: currentPosition?.playerColor || "white",
+                  darkSquareStyle: { backgroundColor: "#7FA650" },
+                  lightSquareStyle: { backgroundColor: "#EFEFD0" },
+                  onPieceDrop: handleDrop,
+                }}
+              />
+            </div>
+
+            {/* Feedback */}
+            {(drillState === "correct" || drillState === "incorrect") && (
+              <div style={{ marginTop: 16 }}>
+                <DrillFeedbackBanner
+                  type={drillState}
+                  movePlayed={lastAttempt?.movePlayed}
+                  bestMove={lastAttempt?.bestMove}
+                  onNext={handleNext}
+                  onRetry={handleRetry}
+                />
+              </div>
+            )}
+          </div>
+
+          {/* Progress bar */}
+          <div style={{ background: "white", border: "2px solid var(--line)", borderRadius: 14, padding: 16 }}>
+            <div style={{ display: "flex", justifyContent: "space-between", fontSize: 11, fontFamily: "var(--mono)", color: "var(--ink-3)", marginBottom: 6 }}>
+              <span>Position {positionIndex + 1} of {session.positions.length}</span>
+              <span>{Math.round(((positionIndex + (drillState !== "thinking" ? 1 : 0)) / session.positions.length) * 100)}%</span>
+            </div>
+            <div style={{ height: 12, background: "var(--bg-2)", borderRadius: 6, overflow: "hidden", border: "1.5px solid var(--line)" }}>
+              <div style={{
+                width: `${((positionIndex + (drillState !== "thinking" ? 1 : 0)) / session.positions.length) * 100}%`,
+                height: "100%", background: "var(--orange)", boxShadow: "inset 0 -3px 0 var(--orange-dark)",
+                transition: "width 300ms",
+              }} />
+            </div>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginTop: 12 }}>
+              <div style={{ background: "var(--bg-2)", borderRadius: 10, padding: 10 }}>
+                <div style={{ fontSize: 18, fontWeight: 900, color: "var(--green)", letterSpacing: -0.5 }}>{stats.correct}</div>
+                <div style={{ fontSize: 10, fontWeight: 700, color: "var(--ink-3)", textTransform: "uppercase", letterSpacing: 0.4 }}>correct</div>
+              </div>
+              <div style={{ background: "var(--bg-2)", borderRadius: 10, padding: 10 }}>
+                <div style={{ fontSize: 18, fontWeight: 900, color: "var(--red)", letterSpacing: -0.5 }}>{stats.incorrect}</div>
+                <div style={{ fontSize: 10, fontWeight: 700, color: "var(--ink-3)", textTransform: "uppercase", letterSpacing: 0.4 }}>incorrect</div>
+              </div>
+            </div>
           </div>
         </div>
+      </div>
+    </div>
+  );
+}
+
+function DrillFeedbackBanner({ type, movePlayed, bestMove, onNext, onRetry }: {
+  type: "correct" | "incorrect"; movePlayed?: string; bestMove?: string; onNext: () => void; onRetry: () => void;
+}) {
+  if (type === "correct") {
+    return (
+      <div style={{ background: "#E8F8E5", border: "2.5px solid var(--green)", borderRadius: 16, padding: 16, boxShadow: "0 4px 0 var(--green-dark)", display: "flex", gap: 14, alignItems: "center" }}>
+        <div style={{ width: 48, height: 48, borderRadius: 12, background: "var(--green)", color: "white", display: "grid", placeItems: "center", fontSize: 22, fontWeight: 900, boxShadow: "0 3px 0 var(--green-dark)", flexShrink: 0 }}>✓</div>
+        <div style={{ flex: 1 }}>
+          <div style={{ fontSize: 14, fontWeight: 900, color: "var(--green-dark)", letterSpacing: 0.4, textTransform: "uppercase" }}>Correct!</div>
+          <div style={{ fontSize: 13, color: "var(--ink)", marginTop: 2, fontWeight: 500 }}>You found <b>{movePlayed}</b>.</div>
+        </div>
+        <button onClick={onNext} className="btn-duo" style={{ background: "var(--green)", color: "white", padding: "16px 22px", borderRadius: 14, fontSize: 13, letterSpacing: 0.6, boxShadow: "0 4px 0 var(--green-dark)", whiteSpace: "nowrap" }}>Next →</button>
+      </div>
+    );
+  }
+  return (
+    <div style={{ background: "#FEECEC", border: "2.5px solid var(--red)", borderRadius: 16, padding: 16, boxShadow: "0 4px 0 #A8281C", display: "flex", gap: 14, alignItems: "center" }}>
+      <div style={{ width: 48, height: 48, borderRadius: 12, background: "var(--red)", color: "white", display: "grid", placeItems: "center", fontSize: 22, fontWeight: 900, boxShadow: "0 3px 0 #A8281C", flexShrink: 0 }}>✗</div>
+      <div style={{ flex: 1 }}>
+        <div style={{ fontSize: 14, fontWeight: 900, color: "#A8281C", letterSpacing: 0.4, textTransform: "uppercase" }}>Not quite</div>
+        <div style={{ fontSize: 13, color: "var(--ink)", marginTop: 2, fontWeight: 500 }}>You played <b>{movePlayed}</b>. Best: <b style={{ color: "var(--green-dark)" }}>{bestMove}</b></div>
+      </div>
+      <div style={{ display: "flex", flexDirection: "column", gap: 6, flexShrink: 0 }}>
+        <button onClick={onRetry} style={{ background: "white", color: "var(--ink)", border: "2px solid var(--line)", padding: "10px 16px", borderRadius: 12, fontFamily: "var(--sans)", fontWeight: 800, fontSize: 12, cursor: "pointer" }}>Retry</button>
+        <button onClick={onNext} className="btn-duo" style={{ background: "var(--red)", color: "white", padding: "10px 16px", borderRadius: 12, fontSize: 12, letterSpacing: 0.4, boxShadow: "0 3px 0 #A8281C" }}>Next</button>
       </div>
     </div>
   );
