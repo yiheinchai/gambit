@@ -1,8 +1,8 @@
 # Gambit Build Log
 
 ## Current State
-**Phase**: Complete. Every PRD feature implemented, tested, pushed.
-**Last updated**: 2026-05-02 iteration 20
+**Phase**: Complete. Every PRD feature implemented, performance optimized, tested, pushed.
+**Last updated**: 2026-05-02 iteration 21
 **Build**: TypeScript clean, 26/26 tests pass, production build passes
 **Codebase**: 34 TS files (5,175 lines) + 8 Python files (1,082 lines)
 **Repo**: https://github.com/yiheinchai/gambit (23 commits)
@@ -37,6 +37,7 @@
 | Mobile CPU warning | Done | `AnalysisProgress.tsx` |
 | Diagnostics page | Done | `debug/page.tsx` (8 tests including ONNX) |
 | Mobile responsive | Done | All components |
+| Worker pooling (parallel analysis) | Done | `stockfish.ts` (StockfishPool), `analysis.ts` (analyzeBatch) |
 
 ## Concept Model
 

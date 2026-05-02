@@ -12,7 +12,7 @@ A browser-based chess improvement app. Users enter their Chess.com username, the
 ## Architecture
 Everything runs client-side except optional LLM explanations (/api/explain → Claude Haiku).
 
-Key libs: `src/lib/stockfish.ts` (engine wrapper), `src/lib/analysis.ts` (pipeline), `src/lib/concept-classifier.ts` (ONNX inference), `src/lib/clustering.ts` (k-means), `src/lib/drill-engine.ts` (SM-2 scheduling).
+Key libs: `src/lib/stockfish.ts` (engine wrapper + StockfishPool for parallel analysis), `src/lib/analysis.ts` (pipeline with analyzeBatch for concurrent games), `src/lib/concept-classifier.ts` (ONNX inference), `src/lib/clustering.ts` (k-means), `src/lib/drill-engine.ts` (SM-2 scheduling).
 
 The concept model (7MB ONNX in `public/models/`) was trained on 50K real Lichess positions using the Python scripts in `training/scripts/`. To retrain: activate `training/.venv`, run `python test_pipeline.py` for a quick validation, or `python train.py --dataset ../data/lichess_concepts.h5` for full training.
 
