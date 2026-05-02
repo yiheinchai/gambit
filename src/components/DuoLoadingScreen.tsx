@@ -49,9 +49,24 @@ export default function DuoLoadingScreen({ progress, username, mistakes, onStop,
             <div style={{ color: "#7FA650" }}>$ stockfish.wasm analyzing {username}</div>
             {lastMistakes.map((m, i) => (
               <div key={i}>
-                move {m.moveNumber}  {m.movePlayed}→{m.bestMove}  cpl={m.centipawnLoss}  <span style={{ color: m.severity === "blunder" ? "#FF8B3D" : m.severity === "mistake" ? "#FF6B6B" : "#FFD23F" }}>
-                  {m.severity.toUpperCase()}
-                </span>
+                <div>
+                  move {m.moveNumber}  {m.movePlayed}→{m.bestMove}  cpl={m.centipawnLoss}  <span style={{ color: m.severity === "blunder" ? "#FF8B3D" : m.severity === "mistake" ? "#FF6B6B" : "#FFD23F" }}>
+                    {m.severity.toUpperCase()}
+                  </span>
+                </div>
+                {m.conceptDiff && (() => {
+                  const top = Array.from(m.conceptDiff)
+                    .map((v, j) => ({ name: CONCEPT_NAMES[j] || "", val: v }))
+                    .filter(c => Math.abs(c.val) > 0.1 && c.name && !c.name.startsWith("feature_"))
+                    .sort((a, b) => Math.abs(b.val) - Math.abs(a.val))
+                    .slice(0, 3);
+                  if (top.length === 0) return null;
+                  return (
+                    <div style={{ color: "#9CA3AF", paddingLeft: 12 }}>
+                      ↳ concept_diff: {top.map(c => `${c.name.replace(/_/g, "")}(${c.val > 0 ? "+" : ""}${c.val.toFixed(2)})`).join(", ")}
+                    </div>
+                  );
+                })()}
               </div>
             ))}
             {lastMistakes.length === 0 && phase === "fetching" && (
