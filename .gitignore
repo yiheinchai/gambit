@@ -21,6 +21,7 @@ npm-debug.log*
 # wasm binaries (large, installed from npm via postinstall)
 /public/stockfish/*.wasm
 /public/onnx/*.wasm
+/public/onnx/*.mjs
 
 # training data, models, and venv (large)
 /training/data/
