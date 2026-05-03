@@ -1,9 +1,10 @@
 import { createRootRoute, Outlet } from "@tanstack/react-router";
+import { AppProvider } from "../store";
 
 export const Route = createRootRoute({
   component: () => (
-    <div className="min-h-full flex flex-col font-sans" style={{ background: "var(--bg)" }}>
+    <AppProvider>
       <Outlet />
-    </div>
+    </AppProvider>
   ),
 });

@@ -9,12 +9,60 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as DebugRouteImport } from './routes/debug'
+import { Route as ReviewRouteImport } from './routes/review'
+import { Route as QuestRouteImport } from './routes/quest'
+import { Route as ProgressRouteImport } from './routes/progress'
+import { Route as LoadingRouteImport } from './routes/loading'
+import { Route as LibraryRouteImport } from './routes/library'
+import { Route as LeaguesRouteImport } from './routes/leagues'
+import { Route as DrillRouteImport } from './routes/drill'
+import { Route as DetailRouteImport } from './routes/detail'
+import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as IndexRouteImport } from './routes/index'
 
-const DebugRoute = DebugRouteImport.update({
-  id: '/debug',
-  path: '/debug',
+const ReviewRoute = ReviewRouteImport.update({
+  id: '/review',
+  path: '/review',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const QuestRoute = QuestRouteImport.update({
+  id: '/quest',
+  path: '/quest',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProgressRoute = ProgressRouteImport.update({
+  id: '/progress',
+  path: '/progress',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoadingRoute = LoadingRouteImport.update({
+  id: '/loading',
+  path: '/loading',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LibraryRoute = LibraryRouteImport.update({
+  id: '/library',
+  path: '/library',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LeaguesRoute = LeaguesRouteImport.update({
+  id: '/leagues',
+  path: '/leagues',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DrillRoute = DrillRouteImport.update({
+  id: '/drill',
+  path: '/drill',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DetailRoute = DetailRouteImport.update({
+  id: '/detail',
+  path: '/detail',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DashboardRoute = DashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -25,37 +73,156 @@ const IndexRoute = IndexRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/debug': typeof DebugRoute
+  '/dashboard': typeof DashboardRoute
+  '/detail': typeof DetailRoute
+  '/drill': typeof DrillRoute
+  '/leagues': typeof LeaguesRoute
+  '/library': typeof LibraryRoute
+  '/loading': typeof LoadingRoute
+  '/progress': typeof ProgressRoute
+  '/quest': typeof QuestRoute
+  '/review': typeof ReviewRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/debug': typeof DebugRoute
+  '/dashboard': typeof DashboardRoute
+  '/detail': typeof DetailRoute
+  '/drill': typeof DrillRoute
+  '/leagues': typeof LeaguesRoute
+  '/library': typeof LibraryRoute
+  '/loading': typeof LoadingRoute
+  '/progress': typeof ProgressRoute
+  '/quest': typeof QuestRoute
+  '/review': typeof ReviewRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/debug': typeof DebugRoute
+  '/dashboard': typeof DashboardRoute
+  '/detail': typeof DetailRoute
+  '/drill': typeof DrillRoute
+  '/leagues': typeof LeaguesRoute
+  '/library': typeof LibraryRoute
+  '/loading': typeof LoadingRoute
+  '/progress': typeof ProgressRoute
+  '/quest': typeof QuestRoute
+  '/review': typeof ReviewRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/debug'
+  fullPaths:
+    | '/'
+    | '/dashboard'
+    | '/detail'
+    | '/drill'
+    | '/leagues'
+    | '/library'
+    | '/loading'
+    | '/progress'
+    | '/quest'
+    | '/review'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/debug'
-  id: '__root__' | '/' | '/debug'
+  to:
+    | '/'
+    | '/dashboard'
+    | '/detail'
+    | '/drill'
+    | '/leagues'
+    | '/library'
+    | '/loading'
+    | '/progress'
+    | '/quest'
+    | '/review'
+  id:
+    | '__root__'
+    | '/'
+    | '/dashboard'
+    | '/detail'
+    | '/drill'
+    | '/leagues'
+    | '/library'
+    | '/loading'
+    | '/progress'
+    | '/quest'
+    | '/review'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  DebugRoute: typeof DebugRoute
+  DashboardRoute: typeof DashboardRoute
+  DetailRoute: typeof DetailRoute
+  DrillRoute: typeof DrillRoute
+  LeaguesRoute: typeof LeaguesRoute
+  LibraryRoute: typeof LibraryRoute
+  LoadingRoute: typeof LoadingRoute
+  ProgressRoute: typeof ProgressRoute
+  QuestRoute: typeof QuestRoute
+  ReviewRoute: typeof ReviewRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/debug': {
-      id: '/debug'
-      path: '/debug'
-      fullPath: '/debug'
-      preLoaderRoute: typeof DebugRouteImport
+    '/review': {
+      id: '/review'
+      path: '/review'
+      fullPath: '/review'
+      preLoaderRoute: typeof ReviewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/quest': {
+      id: '/quest'
+      path: '/quest'
+      fullPath: '/quest'
+      preLoaderRoute: typeof QuestRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/progress': {
+      id: '/progress'
+      path: '/progress'
+      fullPath: '/progress'
+      preLoaderRoute: typeof ProgressRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/loading': {
+      id: '/loading'
+      path: '/loading'
+      fullPath: '/loading'
+      preLoaderRoute: typeof LoadingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/library': {
+      id: '/library'
+      path: '/library'
+      fullPath: '/library'
+      preLoaderRoute: typeof LibraryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/leagues': {
+      id: '/leagues'
+      path: '/leagues'
+      fullPath: '/leagues'
+      preLoaderRoute: typeof LeaguesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/drill': {
+      id: '/drill'
+      path: '/drill'
+      fullPath: '/drill'
+      preLoaderRoute: typeof DrillRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/detail': {
+      id: '/detail'
+      path: '/detail'
+      fullPath: '/detail'
+      preLoaderRoute: typeof DetailRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dashboard': {
+      id: '/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof DashboardRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -70,7 +237,15 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  DebugRoute: DebugRoute,
+  DashboardRoute: DashboardRoute,
+  DetailRoute: DetailRoute,
+  DrillRoute: DrillRoute,
+  LeaguesRoute: LeaguesRoute,
+  LibraryRoute: LibraryRoute,
+  LoadingRoute: LoadingRoute,
+  ProgressRoute: ProgressRoute,
+  QuestRoute: QuestRoute,
+  ReviewRoute: ReviewRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

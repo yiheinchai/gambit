@@ -33,27 +33,5 @@ body {
   background: var(--bg);
   color: var(--ink);
   font-family: var(--sans);
-}
-
-.font-mono {
-  font-family: var(--mono);
-}
-
-/* Duo-style button */
-.btn-duo {
-  border: none;
-  font-family: var(--sans);
-  font-weight: 800;
-  text-transform: uppercase;
-  letter-spacing: 0.4px;
-  cursor: pointer;
-  transition: transform 80ms, box-shadow 80ms;
-}
-
-.btn-duo:hover {
-  transform: translateY(2px);
-}
-
-.btn-duo:active {
-  transform: translateY(4px);
+  margin: 0;
 }
