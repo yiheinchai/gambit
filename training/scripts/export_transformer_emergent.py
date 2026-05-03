@@ -56,6 +56,7 @@ def main():
     parser.add_argument("--checkpoint", required=True)
     parser.add_argument("--sae", required=True)
     parser.add_argument("--concepts-json", default="../models/emergent_concepts_transformer.json")
+    parser.add_argument("--manual-labels", default="../sae_labels_manual.json")
     parser.add_argument("--output", required=True)
     parser.add_argument("--d-model", type=int, default=128)
     parser.add_argument("--n-layers", type=int, default=4)
@@ -108,10 +109,20 @@ def main():
             data = json.load(f)
             features_info = data.get("features", [])
 
+    manual_labels = {}
+    if Path(args.manual_labels).exists():
+        with open(args.manual_labels) as f:
+            manual_labels = json.load(f).get("labels", {})
+        print(f"Loaded {len(manual_labels)} manual labels from {args.manual_labels}")
+
     concept_names = []
     for i in range(sae_data["dict_size"]):
-        feat = next((f for f in features_info if f["id"] == i), None)
-        concept_names.append(feat["name"] if feat else f"feature_{i}")
+        manual = manual_labels.get(str(i))
+        if manual:
+            concept_names.append(manual["short"])
+        else:
+            feat = next((f for f in features_info if f["id"] == i), None)
+            concept_names.append(feat["name"] if feat else f"feature_{i}")
 
     manifest = {
         "type": "emergent-transformer",
